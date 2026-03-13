@@ -1,23 +1,24 @@
-import { forwardRef, ElementType } from 'react'
 import classNames from 'classnames'
+import { forwardRef, ElementType } from 'react'
+
 import { CommonProps } from '@/@types/common'
 
 interface ContainerProps extends CommonProps {
-    asElement?: ElementType
+  asElement?: ElementType
 }
 
 const Container = forwardRef((props: ContainerProps, ref) => {
-    const { className, children, asElement: Component = 'div', ...rest } = props
+  const { className, children, asElement: Component = 'div', ...rest } = props
 
-    return (
-        <Component
-            ref={ref}
-            className={classNames('container mx-auto', className)}
-            {...rest}
-        >
-            {children}
-        </Component>
-    )
+  return (
+    <Component
+      ref={ref}
+      className={classNames('container mx-auto', className)}
+      {...rest}
+    >
+      {children}
+    </Component>
+  )
 })
 
 Container.displayName = 'Container'

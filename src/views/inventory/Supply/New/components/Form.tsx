@@ -1,85 +1,86 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Formik, Form, Field, FieldArray } from "formik";
-import * as Yup from "yup";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Alert } from "@/components/ui";
-import Checkbox from "@/components/ui/Checkbox";
-import { PlusCircle, Trash2 } from "lucide-react";
-import Typography from "@/views/ui-components/common/Typography";
-import { useSelector } from "react-redux";
-import supabase from "@/services/Supabase/BaseClient";
-import { Supply, SupplyVariation } from "@/@types/supply";
-import { Currency } from "@/@types/currency";
-import HandleFeedback from "@/components/ui/FeedBack";
-import { Loading } from "@/components/shared";
+import { Formik, Form, Field, FieldArray } from 'formik'
+import { PlusCircle, Trash2 } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
+import * as Yup from 'yup'
+
+import { Currency } from '@/@types/currency'
+import { Supply, SupplyVariation } from '@/@types/supply'
+import { Loading } from '@/components/shared'
+import { Alert } from '@/components/ui'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import Checkbox from '@/components/ui/Checkbox'
+import HandleFeedback from '@/components/ui/FeedBack'
+import { Input } from '@/components/ui/Input'
+import supabase from '@/services/Supabase/BaseClient'
+import Typography from '@/views/ui-components/common/Typography'
 //import { Product, ProductVariation } from "@/@types/products";
 // Tipos
 
 interface FormValues extends Supply {
-  variations: SupplyVariation[];
-  products: number[];
+  variations: SupplyVariation[]
+  products: number[]
 }
 
 // Valores iniciales
 const initialValues: FormValues = {
-  name: "",
-  type: "fixed",
+  name: '',
+  type: 'fixed',
   supply_variation_id: 0,
   variations: [
     {
       cost: 0,
       currency_id: 0,
-      description: "",
-      measure: "",
+      description: '',
+      measure: '',
       //product_variations: [],
     },
   ],
   products: [],
-};
+}
 
 // Esquema de validación
 const validationSchema = Yup.object().shape({
-  name: Yup.string().required("El nombre es requerido"),
+  name: Yup.string().required('El nombre es requerido'),
   type: Yup.string()
-    .oneOf(["fixed", "variable"])
-    .required("El tipo es requerido"),
+    .oneOf(['fixed', 'variable'])
+    .required('El tipo es requerido'),
   variations: Yup.array()
     .of(
       Yup.object().shape({
         cost: Yup.number()
-          .min(0, "El costo debe ser mayor o igual a 0")
-          .required("El costo es requerido"),
+          .min(0, 'El costo debe ser mayor o igual a 0')
+          .required('El costo es requerido'),
         currency_id: Yup.number()
-          .min(1, "Debe seleccionar una moneda")
-          .required("La moneda es requerida"),
-        description: Yup.string().required("La descripción es requerida"),
-        measure: Yup.string().required("La medida es requerida"),
+          .min(1, 'Debe seleccionar una moneda')
+          .required('La moneda es requerida'),
+        description: Yup.string().required('La descripción es requerida'),
+        measure: Yup.string().required('La medida es requerida'),
         product_variations: Yup.array().of(
           Yup.object().shape({
             id: Yup.number().required(),
             required_supplies: Yup.number()
-              .min(0, "La cantidad requerida debe ser mayor o igual a 0")
-              .required("La cantidad requerida es necesaria"),
+              .min(0, 'La cantidad requerida debe ser mayor o igual a 0')
+              .required('La cantidad requerida es necesaria'),
           })
         ),
       })
     )
-    .min(1, "Debe haber al menos una variación"),
+    .min(1, 'Debe haber al menos una variación'),
   products: Yup.array().of(Yup.number()),
-});
+})
 
 // Servicios mock (reemplazar con servicios de Supabase en producción)
 const fetchCurrencies = async (): Promise<Currency[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, 500))
   return [
-    { id: 1, name: "Dólar", symbol: "USD" },
-    { id: 2, name: "Euro", symbol: "EUR" },
-    { id: 3, name: "Peso Cubano", symbol: "CUP" },
-  ];
-};
+    { id: 1, name: 'Dólar', symbol: 'USD' },
+    { id: 2, name: 'Euro', symbol: 'EUR' },
+    { id: 3, name: 'Peso Cubano', symbol: 'CUP' },
+  ]
+}
 
 /* const fetchProducts = async (): Promise<Product[]> => {
   await new Promise((resolve) => setTimeout(resolve, 500));
@@ -103,11 +104,11 @@ const fetchCurrencies = async (): Promise<Currency[]> => {
   ];
 }; */
 const fetchCurrenciesFromSupabase = async (): Promise<Currency[]> => {
-  const { data, error } = await supabase.from("currency").select("*");
+  const { data, error } = await supabase.from('currency').select('*')
 
-  if (error) throw error;
-  return data;
-};
+  if (error) throw error
+  return data
+}
 // Servicios de Supabase (comentados)
 /*
 import { createClient } from '@supabase/supabase-js'
@@ -159,25 +160,25 @@ const updateSupplyVariationProductVariations = async (
 ) => {
   // Primero, eliminamos todas las relaciones existentes
   const { error: deleteError } = await supabase
-    .from("supply_variation_product_variations")
+    .from('supply_variation_product_variations')
     .delete()
-    .match({ supply_variation_id: supplyVariationId });
+    .match({ supply_variation_id: supplyVariationId })
 
-  if (deleteError) throw deleteError;
+  if (deleteError) throw deleteError
 
   // Luego, insertamos las nuevas relaciones
-  const newRelations = productVariations.map((pv) => ({
+  const newRelations = productVariations.map(pv => ({
     supply_variation_id: supplyVariationId,
     product_variation_id: pv.id,
     required_supplies: pv.required_supplies,
-  }));
+  }))
 
   const { error: insertError } = await supabase
-    .from("supply_variation_product_variations")
-    .insert(newRelations);
+    .from('supply_variation_product_variations')
+    .insert(newRelations)
 
-  if (insertError) throw insertError;
-};
+  if (insertError) throw insertError
+}
 
 const updateProductSupplies = async (
   supplyId: string,
@@ -185,86 +186,86 @@ const updateProductSupplies = async (
 ) => {
   // Primero, eliminamos todas las relaciones existentes
   const { error: deleteError } = await supabase
-    .from("product_supplies")
+    .from('product_supplies')
     .delete()
-    .match({ supply_id: supplyId });
+    .match({ supply_id: supplyId })
 
-  if (deleteError) throw deleteError;
+  if (deleteError) throw deleteError
 
   // Luego, insertamos las nuevas relaciones
-  const newRelations = productIds.map((pId) => ({
+  const newRelations = productIds.map(pId => ({
     supply_id: supplyId,
     product_id: pId,
-  }));
+  }))
 
   const { error: insertError } = await supabase
-    .from("product_supplies")
-    .insert(newRelations);
+    .from('product_supplies')
+    .insert(newRelations)
 
-  if (insertError) throw insertError;
-};
+  if (insertError) throw insertError
+}
 
 // Servicio para obtener un suministro por su ID
 const fetchSupplyById = async (id: number): Promise<Supply> => {
   const { data, error } = await supabase
-    .from("supplies")
-    .select("*")
-    .eq("id", id)
-    .single();
+    .from('supplies')
+    .select('*')
+    .eq('id', id)
+    .single()
 
-  if (error) throw error;
-  return data;
-};
+  if (error) throw error
+  return data
+}
 
 // Servicio para obtener las variaciones de un suministro por su ID
 const fetchExistingVariationsBySupplyId = async (
   supplyId: number
 ): Promise<SupplyVariation[]> => {
   const { data, error } = await supabase
-    .from("supply_variation")
-    .select("*")
-    .eq("supply_id", supplyId);
+    .from('supply_variation')
+    .select('*')
+    .eq('supply_id', supplyId)
 
-  if (error) throw error;
-  return data;
-};
+  if (error) throw error
+  return data
+}
 
 // Servicio para crear un nuevo suministro
 const createSupply = async (supply: Supply): Promise<Supply> => {
   const { data, error } = await supabase
-    .from("supplies")
+    .from('supplies')
     .upsert(supply)
-    .select("id")
-    .single();
-  console.log("SOY", data);
-  if (error) throw error;
-  return data;
-};
+    .select('id')
+    .single()
+  console.log('SOY', data)
+  if (error) throw error
+  return data
+}
 
 // Servicio para actualizar un suministro existente
 const updateSupply = async (id, supply: Supply): Promise<Supply> => {
   const { data, error } = await supabase
-    .from("supplies")
+    .from('supplies')
     .update(supply)
-    .eq("id", id)
-    .single();
+    .eq('id', id)
+    .single()
 
-  if (error) throw error;
-  return data;
-};
+  if (error) throw error
+  return data
+}
 
 // Servicio para crear nuevas variaciones de un suministro
 const createSupplyVariations = async (
   variations: SupplyVariation[]
 ): Promise<SupplyVariation[]> => {
   const { data, error } = await supabase
-    .from("supply_variation")
+    .from('supply_variation')
     .upsert(variations)
-    .select();
+    .select()
 
-  if (error) throw error;
-  return data;
-};
+  if (error) throw error
+  return data
+}
 
 // Servicio para actualizar una variación existente de un suministro
 const updateSupplyVariation = async (
@@ -272,56 +273,56 @@ const updateSupplyVariation = async (
   variation: SupplyVariation
 ): Promise<SupplyVariation> => {
   const { data, error } = await supabase
-    .from("supply_variation")
+    .from('supply_variation')
     .update(variation)
-    .eq("id", supplyVarId)
-    .single();
+    .eq('id', supplyVarId)
+    .single()
 
-  if (error) throw error;
-  return data;
-};
+  if (error) throw error
+  return data
+}
 
 // Servicio para eliminar una variación de un suministro
 const deleteSupplyVariation = async (variationId: number): Promise<void> => {
   const { error } = await supabase
-    .from("supply_variation")
+    .from('supply_variation')
     .delete()
-    .eq("id", variationId);
+    .eq('id', variationId)
 
-  if (error) throw error;
-};
+  if (error) throw error
+}
 
 export default function SupplyForm() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>()
   const [initialFormValues, setInitialFormValues] =
-    useState<FormValues>(initialValues);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [currencies, setCurrencies] = useState<Currency[]>([]);
+    useState<FormValues>(initialValues)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [currencies, setCurrencies] = useState<Currency[]>([])
   //const [products, setProducts] = useState<Product[]>([]);
-  const [valueRan, setValueRan] = useState("");
-  const user = useSelector((state) => state.auth.user);
-  const { handleSuccess, handleError } = HandleFeedback();
+  const [valueRan, setValueRan] = useState('')
+  const user = useSelector(state => state.auth.user)
+  const { handleSuccess, handleError } = HandleFeedback()
 
   useEffect(() => {
     const loadData = async () => {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
         // Cargar monedas desde Supabase
-        const currenciesData = await fetchCurrenciesFromSupabase();
-        setCurrencies(currenciesData);
+        const currenciesData = await fetchCurrenciesFromSupabase()
+        setCurrencies(currenciesData)
 
         if (id) {
           // Cargar el suministro existente desde Supabase
-          const supply = await fetchSupplyById(id);
-          console.log("HOW", user);
+          const supply = await fetchSupplyById(id)
+          console.log('HOW', user)
           // Verificar si el suministro pertenece a la tienda del usuario
           if (supply.shop_id !== user.shopId) {
-            throw new Error("No tienes permiso para editar este suministro");
+            throw new Error('No tienes permiso para editar este suministro')
           }
 
           // Cargar variaciones existentes del suministro
-          const variations = await fetchExistingVariationsBySupplyId(id);
+          const variations = await fetchExistingVariationsBySupplyId(id)
 
           // Configurar los valores iniciales del formulario
           setInitialFormValues({
@@ -331,17 +332,17 @@ export default function SupplyForm() {
             supply_variation_id: supply.supply_variation_id,
             variations: variations,
             //products: products.map((p) => p.id),
-          });
+          })
         }
       } catch (err) {
-        handleError(err.message || "Error al cargar los datos iniciales");
+        handleError(err.message || 'Error al cargar los datos iniciales')
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    };
+    }
 
-    loadData();
-  }, [id, user.shopId]);
+    loadData()
+  }, [id, user.shopId])
 
   const handleSubmit = async (
     values: FormValues,
@@ -349,16 +350,16 @@ export default function SupplyForm() {
   ) => {
     try {
       // Obtener el shopId del usuario desde Redux
-      let supply;
+      let supply
 
       // Actualizar se reconoce por el Id
       if (values.id) {
         // Obtener el suministro existente
-        const existingSupply = await fetchSupplyById(values.id);
+        const existingSupply = await fetchSupplyById(values.id)
 
         // Verificar si el suministro pertenece a la tienda del usuario
         if (existingSupply.shop_id !== user.shopId) {
-          throw new Error("No tienes permiso para editar este suministro");
+          throw new Error('No tienes permiso para editar este suministro')
         }
 
         // Actualizar el suministro
@@ -366,25 +367,25 @@ export default function SupplyForm() {
           name: values.name,
           type: values.type,
           shop_id: user.shopId, // Asegurarse de que el shop_id no cambie
-        });
+        })
 
-        console.log(values.variations);
+        console.log(values.variations)
         // Actualizar y crear variaciones
         for (const variation of values.variations) {
           if (variation.id) {
-            const { id: variationId } = variation;
-            delete variation.id;
+            const { id: variationId } = variation
+            delete variation.id
             // Actualizar variación existente
-            await updateSupplyVariation(variationId, variation);
+            await updateSupplyVariation(variationId, variation)
           } else {
-            console.log("first2");
+            console.log('first2')
             // Crear nueva variación
             await createSupplyVariations([
               {
                 ...variation,
                 supply_id: +id,
               },
-            ]);
+            ])
           }
         }
       } else {
@@ -393,31 +394,31 @@ export default function SupplyForm() {
           name: values.name,
           type: values.type,
           shop_id: user.shopId,
-        });
+        })
 
         // Crear variaciones para el nuevo suministro
-        const variationsToCreate = values.variations.map((v) => ({
+        const variationsToCreate = values.variations.map(v => ({
           ...v,
           supply_id: supply.id,
-        }));
-        await createSupplyVariations(variationsToCreate);
+        }))
+        await createSupplyVariations(variationsToCreate)
       }
 
-      handleSuccess(values.id ? "Suministro actualizado" : "Suministro creado");
+      handleSuccess(values.id ? 'Suministro actualizado' : 'Suministro creado')
     } catch (err) {
-      handleError(err.message || "Error al guardar el suministro");
+      handleError(err.message || 'Error al guardar el suministro')
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   if (error) {
-    return <Alert variant="default">{error}</Alert>;
+    return <Alert variant='default'>{error}</Alert>
   }
 
   return (
     <Loading loading={isLoading}>
-      <div className="w-full max-w-2xl mx-auto">
+      <div className='w-full max-w-2xl mx-auto'>
         <Formik
           initialValues={initialFormValues}
           validationSchema={validationSchema}
@@ -425,47 +426,47 @@ export default function SupplyForm() {
           enableReinitialize
         >
           {({ values, errors, touched, isSubmitting, setFieldValue }) => (
-            <Form className="space-y-6">
+            <Form className='space-y-6'>
               <div>
-                <label htmlFor="name">Nombre</label>
-                <Field name="name" as={Input} className="mt-1" />
+                <label htmlFor='name'>Nombre</label>
+                <Field name='name' as={Input} className='mt-1' />
                 {errors.name && touched.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                  <p className='text-red-500 text-sm mt-1'>{errors.name}</p>
                 )}
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className='flex items-center space-x-2'>
                 <Checkbox
-                  id="fixed"
-                  checked={values.type === "fixed"}
-                  onChange={(checked) => {
-                    setFieldValue("type", checked ? "fixed" : "variable");
+                  id='fixed'
+                  checked={values.type === 'fixed'}
+                  onChange={checked => {
+                    setFieldValue('type', checked ? 'fixed' : 'variable')
                   }}
                 />
-                <label htmlFor="fixed">Fijo</label>
+                <label htmlFor='fixed'>Fijo</label>
               </div>
 
-              <div className="flex items-center space-x-2">
+              <div className='flex items-center space-x-2'>
                 <Checkbox
-                  id="variable"
-                  checked={values.type === "variable"}
-                  onChange={(checked) => {
-                    setFieldValue("type", checked ? "variable" : "fixed");
+                  id='variable'
+                  checked={values.type === 'variable'}
+                  onChange={checked => {
+                    setFieldValue('type', checked ? 'variable' : 'fixed')
                   }}
                 />
-                <label htmlFor="variable">Variable</label>
+                <label htmlFor='variable'>Variable</label>
               </div>
 
-              <FieldArray name="variations">
+              <FieldArray name='variations'>
                 {({ push, remove }) => (
                   <div>
                     {values.variations.map((variation, index) => (
-                      <Card key={index} className="mb-4">
-                        <div className="pt-6">
-                          <h3 className="text-lg font-semibold mb-4">
+                      <Card key={index} className='mb-4'>
+                        <div className='pt-6'>
+                          <h3 className='text-lg font-semibold mb-4'>
                             Variante {index + 1}
                           </h3>
-                          <div className="space-y-4">
+                          <div className='space-y-4'>
                             <div>
                               <label
                                 htmlFor={`variations.${index}.description`}
@@ -475,11 +476,11 @@ export default function SupplyForm() {
                               <Field
                                 name={`variations.${index}.description`}
                                 as={Input}
-                                className="mt-1"
+                                className='mt-1'
                               />
                               {errors.variations?.[index]?.description &&
                                 touched.variations?.[index]?.description && (
-                                  <p className="text-red-500 text-sm mt-1">
+                                  <p className='text-red-500 text-sm mt-1'>
                                     {errors.variations[index].description}
                                   </p>
                                 )}
@@ -490,13 +491,13 @@ export default function SupplyForm() {
                               </label>
                               <Field
                                 name={`variations.${index}.cost`}
-                                type="number"
+                                type='number'
                                 as={Input}
-                                className="mt-1"
+                                className='mt-1'
                               />
                               {errors.variations?.[index]?.cost &&
                                 touched.variations?.[index]?.cost && (
-                                  <p className="text-red-500 text-sm mt-1">
+                                  <p className='text-red-500 text-sm mt-1'>
                                     {errors.variations[index].cost}
                                   </p>
                                 )}
@@ -504,11 +505,11 @@ export default function SupplyForm() {
 
                             <div>
                               <label>Moneda</label>
-                              <div className="space-y-2">
-                                {currencies.map((currency) => (
+                              <div className='space-y-2'>
+                                {currencies.map(currency => (
                                   <div
                                     key={currency.id}
-                                    className="flex items-center space-x-2"
+                                    className='flex items-center space-x-2'
                                   >
                                     <Checkbox
                                       id={`currency-${currency.id}-${index}`}
@@ -516,31 +517,31 @@ export default function SupplyForm() {
                                         values.variations[index].currency_id ===
                                         currency.id
                                       }
-                                      onChange={(checked) => {
+                                      onChange={checked => {
                                         if (checked) {
                                           setFieldValue(
                                             `variations.${index}.currency_id`,
                                             currency.id
-                                          );
+                                          )
                                         } else {
                                           setFieldValue(
                                             `variations.${index}.currency_id`,
                                             0
-                                          );
+                                          )
                                         }
                                       }}
                                     />
                                     <label
                                       htmlFor={`currency-${currency.id}-${index}`}
                                     >
-                                      {currency.name}{" "}
+                                      {currency.name}{' '}
                                     </label>
                                   </div>
                                 ))}
                               </div>
                               {errors.variations?.[index]?.currency_id &&
                                 touched.variations?.[index]?.currency_id && (
-                                  <p className="text-red-500 text-sm mt-1">
+                                  <p className='text-red-500 text-sm mt-1'>
                                     {errors.variations[index].currency_id}
                                   </p>
                                 )}
@@ -553,28 +554,28 @@ export default function SupplyForm() {
                               <Field
                                 name={`variations.${index}.measure`}
                                 as={Input}
-                                className="mt-1"
-                                placeholder="1 Unidad / 1 Litro / 1 Metro"
+                                className='mt-1'
+                                placeholder='1 Unidad / 1 Litro / 1 Metro'
                               />
                               {errors.variations?.[index]?.measure &&
                                 touched.variations?.[index]?.measure && (
-                                  <p className="text-red-500 text-sm mt-1">
+                                  <p className='text-red-500 text-sm mt-1'>
                                     {errors.variations[index].measure}
                                   </p>
                                 )}
                             </div>
                             <div>
-                              <div className="space-y-4 mt-2"></div>
+                              <div className='space-y-4 mt-2'></div>
                             </div>
                             {index > 0 && (
                               <Button
-                                type="button"
-                                variant="default"
+                                type='button'
+                                variant='default'
                                 onClick={() => remove(index)}
-                                className="mt-2"
+                                className='mt-2'
                               >
-                                <div className="flex justify-center text-center">
-                                  <Trash2 className="mr-2 h-4 w-4" /> Eliminar
+                                <div className='flex justify-center text-center'>
+                                  <Trash2 className='mr-2 h-4 w-4' /> Eliminar
                                   Variación
                                 </div>
                               </Button>
@@ -584,14 +585,14 @@ export default function SupplyForm() {
                       </Card>
                     ))}
                     <Button
-                      type="button"
-                      variant="default"
+                      type='button'
+                      variant='default'
                       onClick={() =>
                         push({
                           cost: 0, // Valor vacío para el costo
                           currency_id: 0, // Valor vacío para el ID de la moneda
-                          description: "", // Cadena vacía para la descripción
-                          measure: "", // Cadena vacía para la medida
+                          description: '', // Cadena vacía para la descripción
+                          measure: '', // Cadena vacía para la medida
                           supply_id: 0, // Valor vacío para el ID de suministro
                           // product_variations: [
                           //   { id: null, required_supplies: 0 }, // Valores vacíos para la variación de producto
@@ -599,25 +600,25 @@ export default function SupplyForm() {
                         })
                       }
                     >
-                      <div className="flex text-center justify-center">
-                        <PlusCircle className="mr-2 h-4 w-4" /> Añadir Variación
+                      <div className='flex text-center justify-center'>
+                        <PlusCircle className='mr-2 h-4 w-4' /> Añadir Variación
                       </div>
                     </Button>
                   </div>
                 )}
               </FieldArray>
 
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type='submit' disabled={isSubmitting}>
                 {isSubmitting
-                  ? "Enviando..."
+                  ? 'Enviando...'
                   : id
-                  ? "Actualizar Suministro"
-                  : "Crear Suministro"}
+                  ? 'Actualizar Suministro'
+                  : 'Crear Suministro'}
               </Button>
             </Form>
           )}
         </Formik>
       </div>
     </Loading>
-  );
+  )
 }

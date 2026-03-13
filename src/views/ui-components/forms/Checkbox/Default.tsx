@@ -1,18 +1,19 @@
-import Checkbox from '@/components/ui/Checkbox'
 import type { ChangeEvent } from 'react'
 
-const Default = () => {
-    const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
-        console.log(value, e)
-    }
+import Checkbox from '@/components/ui/Checkbox'
 
-    return (
-        <div>
-            <Checkbox defaultChecked onChange={onCheck}>
-                Checkbox
-            </Checkbox>
-        </div>
-    )
+const Default = () => {
+  const onCheck = (value: boolean, e: ChangeEvent<HTMLInputElement>) => {
+    console.log(value, e)
+  }
+
+  return (
+    <div>
+      <Checkbox defaultChecked onChange={onCheck}>
+        Checkbox
+      </Checkbox>
+    </div>
+  )
 }
 
 export default Default

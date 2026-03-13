@@ -1,19 +1,20 @@
-import Avatar from "@/components/ui/Avatar";
-import Dropdown from "@/components/ui/Dropdown";
-import withHeaderItem from "@/utils/hoc/withHeaderItem";
-import useAuth from "@/utils/hooks/useAuth";
-import { useAppSelector } from "@/store";
-import { Link } from "react-router-dom";
-import classNames from "classnames";
-import { HiOutlineUser, HiOutlineCog, HiOutlineLogout } from "react-icons/hi";
-import { FiActivity } from "react-icons/fi";
-import type { CommonProps } from "@/@types/common";
+import classNames from 'classnames'
+import { FiActivity } from 'react-icons/fi'
+import { HiOutlineUser, HiOutlineCog, HiOutlineLogout } from 'react-icons/hi'
+import { Link } from 'react-router-dom'
+
+import type { CommonProps } from '@/@types/common'
+import Avatar from '@/components/ui/Avatar'
+import Dropdown from '@/components/ui/Dropdown'
+import { useAppSelector } from '@/store'
+import withHeaderItem from '@/utils/hoc/withHeaderItem'
+import useAuth from '@/utils/hooks/useAuth'
 
 type DropdownList = {
-  label: string;
-  path: string;
-  icon: JSX.Element;
-};
+  label: string
+  path: string
+  icon: JSX.Element
+}
 
 const dropdownItemList: DropdownList[] = [
   //   {
@@ -31,68 +32,68 @@ const dropdownItemList: DropdownList[] = [
         path: '/app/account/activity-log',
         icon: <FiActivity />,
     }, */
-];
+]
 
 const _UserDropdown = ({ className }: CommonProps) => {
-  const { name, email } = useAppSelector((state) => state.auth.user);
+  const { name, email } = useAppSelector(state => state.auth.user)
 
-  const { signOut } = useAuth();
+  const { signOut } = useAuth()
 
   const UserAvatar = (
-    <div className={classNames(className, "flex items-center gap-2")}>
+    <div className={classNames(className, 'flex items-center gap-2')}>
       {/* <Avatar size={32} shape="circle" src={avatar} /> */}
-      <div className="hidden md:block">
-        <div className="text-xs capitalize">{email}</div>
-        <div className="font-bold">{name}</div>
+      <div className='hidden md:block'>
+        <div className='text-xs capitalize'>{email}</div>
+        <div className='font-bold'>{name}</div>
       </div>
     </div>
-  );
+  )
 
   return (
     <div>
       <Dropdown
         menuStyle={{ minWidth: 240 }}
         renderTitle={UserAvatar}
-        placement="bottom-end"
+        placement='bottom-end'
       >
-        <Dropdown.Item variant="header">
-          <div className="py-2 px-3 flex items-center gap-2">
+        <Dropdown.Item variant='header'>
+          <div className='py-2 px-3 flex items-center gap-2'>
             {/* <Avatar shape="circle" src={avatar} /> */}
             <div>
-              <div className="font-bold text-gray-900 dark:text-gray-100">
+              <div className='font-bold text-gray-900 dark:text-gray-100'>
                 {name}
               </div>
-              <div className="text-xs">{email}</div>
+              <div className='text-xs'>{email}</div>
             </div>
           </div>
         </Dropdown.Item>
-        <Dropdown.Item variant="divider" />
-        {dropdownItemList.map((item) => (
+        <Dropdown.Item variant='divider' />
+        {dropdownItemList.map(item => (
           <Dropdown.Item
             key={item.label}
             eventKey={item.label}
-            className="mb-1 px-0"
+            className='mb-1 px-0'
           >
-            <Link className="flex h-full w-full px-2" to={item.path}>
-              <span className="flex gap-2 items-center w-full">
-                <span className="text-xl opacity-50">{item.icon}</span>
+            <Link className='flex h-full w-full px-2' to={item.path}>
+              <span className='flex gap-2 items-center w-full'>
+                <span className='text-xl opacity-50'>{item.icon}</span>
                 <span>{item.label}</span>
               </span>
             </Link>
           </Dropdown.Item>
         ))}
-        <Dropdown.Item variant="divider" />
-        <Dropdown.Item eventKey="Sign Out" className="gap-2" onClick={signOut}>
-          <span className="text-xl opacity-50">
+        <Dropdown.Item variant='divider' />
+        <Dropdown.Item eventKey='Sign Out' className='gap-2' onClick={signOut}>
+          <span className='text-xl opacity-50'>
             <HiOutlineLogout />
           </span>
           <span>Cerrar Sesión</span>
         </Dropdown.Item>
       </Dropdown>
     </div>
-  );
-};
+  )
+}
 
-const UserDropdown = withHeaderItem(_UserDropdown);
+const UserDropdown = withHeaderItem(_UserDropdown)
 
-export default UserDropdown;
+export default UserDropdown

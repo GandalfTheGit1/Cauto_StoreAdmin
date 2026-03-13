@@ -1,49 +1,50 @@
-import classNames from "classnames";
-import HorizontalMenuContent from "@/components/template/HorizontalMenuContent";
-import { NAV_MODE_THEMED } from "@/constants/theme.constant";
-import useResponsive from "@/utils/hooks/useResponsive";
-import { useAppSelector } from "@/store";
-import type { CommonProps } from "@/@types/common";
+import classNames from 'classnames'
+
+import type { CommonProps } from '@/@types/common'
+import HorizontalMenuContent from '@/components/template/HorizontalMenuContent'
+import { NAV_MODE_THEMED } from '@/constants/theme.constant'
+import { useAppSelector } from '@/store'
+import useResponsive from '@/utils/hooks/useResponsive'
 
 interface SecondaryHeaderProps extends CommonProps {
-  contained: boolean;
+  contained: boolean
 }
 
 const SecondaryHeader = (props: SecondaryHeaderProps) => {
-  const { className, contained } = props;
+  const { className, contained } = props
 
-  const navMode = useAppSelector((state) => state.theme.navMode);
-  const themeColor = useAppSelector((state) => state.theme.themeColor);
+  const navMode = useAppSelector(state => state.theme.navMode)
+  const themeColor = useAppSelector(state => state.theme.themeColor)
   const primaryColorLevel = useAppSelector(
-    (state) => state.theme.primaryColorLevel
-  );
-  const userAuthority = useAppSelector((state) => state.auth.user.authority);
+    state => state.theme.primaryColorLevel
+  )
+  const userAuthority = useAppSelector(state => state.auth.user.authority)
 
-  console.log("KKK", userAuthority);
+  console.log('KKK', userAuthority)
 
-  const { larger } = useResponsive();
+  const { larger } = useResponsive()
 
   const headerColor = () => {
     if (navMode === NAV_MODE_THEMED) {
-      return `bg-${themeColor}-${primaryColorLevel} secondary-header-${navMode}`;
+      return `bg-${themeColor}-${primaryColorLevel} secondary-header-${navMode}`
     }
-    return `secondary-header-${navMode}`;
-  };
+    return `secondary-header-${navMode}`
+  }
 
   return (
     <>
       {larger.md && (
         <div
           className={classNames(
-            "h-16 flex items-center",
+            'h-16 flex items-center',
             headerColor(),
             className
           )}
         >
           <div
             className={classNames(
-              "flex items-center px-4",
-              contained && "container mx-auto"
+              'flex items-center px-4',
+              contained && 'container mx-auto'
             )}
           >
             <HorizontalMenuContent
@@ -54,7 +55,7 @@ const SecondaryHeader = (props: SecondaryHeaderProps) => {
         </div>
       )}
     </>
-  );
-};
+  )
+}
 
-export default SecondaryHeader;
+export default SecondaryHeader

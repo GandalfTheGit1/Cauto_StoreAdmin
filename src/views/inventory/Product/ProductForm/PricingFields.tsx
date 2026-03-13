@@ -1,103 +1,105 @@
-import AdaptableCard from "@/components/shared/AdaptableCard";
-import { Select } from "@/components/ui";
-import { FormItem } from "@/components/ui/Form";
-import type { InputProps } from "@/components/ui/Input";
-import Input from "@/components/ui/Input";
 import {
   Field,
   FieldInputProps,
   FieldProps,
   FormikErrors,
   FormikTouched,
-} from "formik";
-import { useEffect, useState, type ComponentType } from "react";
-import { NumericFormat, NumericFormatProps } from "react-number-format";
-import { supabaseService } from "@/services/Supabase/AttributeService";
-import { transformArrayToObjectArray } from "./ProductForm";
+} from 'formik'
+import { useEffect, useState, type ComponentType } from 'react'
+import { NumericFormat, NumericFormatProps } from 'react-number-format'
+
+import AdaptableCard from '@/components/shared/AdaptableCard'
+import { Select } from '@/components/ui'
+import { FormItem } from '@/components/ui/Form'
+import type { InputProps } from '@/components/ui/Input'
+import Input from '@/components/ui/Input'
+import { supabaseService } from '@/services/Supabase/AttributeService'
+
+import { transformArrayToObjectArray } from './ProductForm'
 
 // Nuevos tipos
-type ProductStatus = "new" | "out_of_stock" | "in_stock" | "discontinued";
+type ProductStatus = 'new' | 'out_of_stock' | 'in_stock' | 'discontinued'
 
 type ProductPricing = {
-  cost?: number;
-  standard_price: number;
-  discount: number;
-  commission: number;
-  commission_type: "percentage" | "fixed";
-  reference_currency: string;
-  status: ProductStatus;
-};
+  cost?: number
+  standard_price: number
+  discount: number
+  commission: number
+  commission_type: 'percentage' | 'fixed'
+  reference_currency: string
+  status: ProductStatus
+}
 
 type PricingFieldsProps = {
-  touched: FormikTouched<ProductPricing>;
-  errors: FormikErrors<ProductPricing>;
-  values: ProductPricing;
-};
+  touched: FormikTouched<ProductPricing>
+  errors: FormikErrors<ProductPricing>
+  values: ProductPricing
+}
 
 const PriceInput = (props: InputProps) => {
-  return <Input {...props} value={props.field.value} prefix="$" />;
-};
+  return <Input {...props} value={props.field.value} prefix='$' />
+}
 
 const NumericFormatInput = ({
   onValueChange,
   ...rest
-}: Omit<NumericFormatProps, "form"> & {
-  form: any;
-  field: FieldInputProps<unknown>;
+}: Omit<NumericFormatProps, 'form'> & {
+  form: any
+  field: FieldInputProps<unknown>
 }) => {
   return (
     <NumericFormat
       customInput={Input as ComponentType}
-      type="text"
-      autoComplete="off"
+      type='text'
+      autoComplete='off'
       onValueChange={onValueChange}
       {...rest}
     />
-  );
-};
+  )
+}
 
 const PricingFields = (props: PricingFieldsProps) => {
-  const { values, touched, errors } = props;
+  const { values, touched, errors } = props
   const [prefix, setPrefix] = useState(
-    values.commission_type === "percentage" ? "%" : "$"
-  );
+    values.commission_type === 'percentage' ? '%' : '$'
+  )
 
   const typeOfCommision = [
-    { value: "percentage", label: "Porcentaje" },
-    { value: "fixed", label: "Fijo" },
-  ];
+    { value: 'percentage', label: 'Porcentaje' },
+    { value: 'fixed', label: 'Fijo' },
+  ]
 
   const [currencies, setCurrencies] = useState([
-    { value: "CUP", label: "CUP" },
-    { value: "USD", label: "USD" },
-    { value: "EURO", label: "EURO" },
-  ]);
+    { value: 'CUP', label: 'CUP' },
+    { value: 'USD', label: 'USD' },
+    { value: 'EURO', label: 'EURO' },
+  ])
 
   useEffect(() => {
     const currenciesFetch = async () => {
-      const currencies = await supabaseService.getCurrencies().then((data) => {
-        return transformArrayToObjectArray(data);
-      });
-      setCurrencies(currencies);
-      return [];
-    };
-    currenciesFetch();
-  }, []);
+      const currencies = await supabaseService.getCurrencies().then(data => {
+        return transformArrayToObjectArray(data)
+      })
+      setCurrencies(currencies)
+      return []
+    }
+    currenciesFetch()
+  }, [])
 
   useEffect(() => {
-    console.log(values);
-    setPrefix(values.commission_type === "percentage" ? "%" : "$");
-  }, [values.commission_type]);
+    console.log(values)
+    setPrefix(values.commission_type === 'percentage' ? '%' : '$')
+  }, [values.commission_type])
 
   return (
-    <AdaptableCard divider className="mb-4">
+    <AdaptableCard divider className='mb-4'>
       <h5>Sistema de Precios</h5>
-      <p className="mb-6">Configuración de Precios</p>
+      <p className='mb-6'>Configuración de Precios</p>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="col-span-1">
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <div className='col-span-1'>
           <FormItem
-            label="Moneda de Referencia"
+            label='Moneda de Referencia'
             invalid={
               (errors.reference_currency &&
                 touched.reference_currency) as boolean
@@ -111,9 +113,9 @@ const PricingFields = (props: PricingFieldsProps) => {
                   form={form}
                   options={currencies}
                   value={currencies.find(
-                    (currency) => currency.value === values.reference_currency
+                    currency => currency.value === values.reference_currency
                   )}
-                  onChange={(option) =>
+                  onChange={option =>
                     form.setFieldValue(field.name, option?.value)
                   }
                 />
@@ -121,9 +123,9 @@ const PricingFields = (props: PricingFieldsProps) => {
             </Field>
           </FormItem>
         </div>
-        <div className="col-span-1">
+        <div className='col-span-1'>
           <FormItem
-            label="Precio en el Catálogo( $0 No se Presentará el precio en el Catálogo)"
+            label='Precio en el Catálogo( $0 No se Presentará el precio en el Catálogo)'
             invalid={
               (errors.standard_price && touched.standard_price) as boolean
             }
@@ -134,9 +136,9 @@ const PricingFields = (props: PricingFieldsProps) => {
                 <NumericFormatInput
                   form={form}
                   field={field}
-                  placeholder="Precio estándar"
+                  placeholder='Precio estándar'
                   customInput={PriceInput as ComponentType}
-                  onValueChange={(e) => form.setFieldValue(field.name, e.value)}
+                  onValueChange={e => form.setFieldValue(field.name, e.value)}
                 />
               )}
             </Field>
@@ -144,10 +146,10 @@ const PricingFields = (props: PricingFieldsProps) => {
         </div>
       </div>
 
-      {values.origin === "imported" && (
-        <div className="col-span-1">
+      {values.origin === 'imported' && (
+        <div className='col-span-1'>
           <FormItem
-            label="Costo del Producto"
+            label='Costo del Producto'
             invalid={(errors.cost && touched.cost) as boolean}
             errorMessage={errors.cost}
           >
@@ -156,16 +158,16 @@ const PricingFields = (props: PricingFieldsProps) => {
                 <NumericFormatInput
                   form={form}
                   field={field}
-                  placeholder="Costo del producto importado"
+                  placeholder='Costo del producto importado'
                   customInput={PriceInput as ComponentType}
-                  onValueChange={(e) => form.setFieldValue(field.name, e.value)}
+                  onValueChange={e => form.setFieldValue(field.name, e.value)}
                 />
               )}
             </Field>
           </FormItem>
         </div>
       )}
-     {/*  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/*  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="col-span-1">
           <FormItem
             label="Descuento"
@@ -191,10 +193,10 @@ const PricingFields = (props: PricingFieldsProps) => {
           </FormItem>
         </div>
       </div> */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="col-span-1">
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <div className='col-span-1'>
           <FormItem
-            label="Tipo de Comisión"
+            label='Tipo de Comisión'
             invalid={
               (errors.commission_type && touched.commission_type) as boolean
             }
@@ -207,13 +209,13 @@ const PricingFields = (props: PricingFieldsProps) => {
                   form={form}
                   options={typeOfCommision}
                   value={typeOfCommision.find(
-                    (type) => type.value === values.commission_type
+                    type => type.value === values.commission_type
                   )}
-                  onChange={(option) => {
-                    form.setFieldValue(field.name, option.value);
+                  onChange={option => {
+                    form.setFieldValue(field.name, option.value)
                     setPrefix(
-                      values.commission_type === "percentage" ? "%" : "$"
-                    );
+                      values.commission_type === 'percentage' ? '%' : '$'
+                    )
                     // Resetear el valor de la comisión cuando cambia el tipo
                   }}
                 />
@@ -221,9 +223,9 @@ const PricingFields = (props: PricingFieldsProps) => {
             </Field>
           </FormItem>
         </div>
-        <div className="col-span-1">
+        <div className='col-span-1'>
           <FormItem
-            label="Comisión del Gestor"
+            label='Comisión del Gestor'
             invalid={(errors.commission && touched.commission) as boolean}
             errorMessage={errors.commission}
           >
@@ -233,9 +235,9 @@ const PricingFields = (props: PricingFieldsProps) => {
                   form={form}
                   field={field}
                   value={values.commission}
-                  placeholder="Comisión"
+                  placeholder='Comisión'
                   customInput={Input as ComponentType}
-                  onValueChange={(e) => form.setFieldValue(field.name, e.value)}
+                  onValueChange={e => form.setFieldValue(field.name, e.value)}
                   prefix={prefix}
                 />
               )}
@@ -244,7 +246,7 @@ const PricingFields = (props: PricingFieldsProps) => {
         </div>
       </div>
     </AdaptableCard>
-  );
-};
+  )
+}
 
-export default PricingFields;
+export default PricingFields

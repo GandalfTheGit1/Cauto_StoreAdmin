@@ -1,11 +1,9 @@
-import FormDialog from "./index";
-import { apiCreateSubcategory } from "@/services/inventory/SubcategoryService";
+import { apiCreateSubcategory } from '@/services/inventory/SubcategoryService'
 
-export default function CreateSubcategoryElement (){
-    return (
-        <FormDialog
-            apiService={apiCreateSubcategory}
-            defaultValue={{name: ''}}
-        />
-    )
+import FormDialog from './index'
+
+export default function CreateSubcategoryElement() {
+  return (
+    <FormDialog apiService={apiCreateSubcategory} defaultValue={{ name: '' }} />
+  )
 }

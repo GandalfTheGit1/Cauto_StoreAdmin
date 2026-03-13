@@ -1,11 +1,12 @@
-import HorizontalMenuContent from "./HorizontalMenuContent";
-import useResponsive from "@/utils/hooks/useResponsive";
-import { useAppSelector } from "@/store";
+import { useAppSelector } from '@/store'
+import useResponsive from '@/utils/hooks/useResponsive'
+
+import HorizontalMenuContent from './HorizontalMenuContent'
 
 const HorizontalNav = () => {
-  const mode = useAppSelector((state) => state.theme.mode);
-  const userAuthority = useAppSelector((state) => state.auth.user.authority);
-  const { larger } = useResponsive();
+  const mode = useAppSelector(state => state.theme.mode)
+  const userAuthority = useAppSelector(state => state.auth.user.authority)
+  const { larger } = useResponsive()
 
   return (
     <>
@@ -16,7 +17,7 @@ const HorizontalNav = () => {
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default HorizontalNav;
+export default HorizontalNav

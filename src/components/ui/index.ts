@@ -34,39 +34,39 @@ export { default as TimeInput } from './TimeInput'
 export { default as Timeline } from './Timeline'
 export { default as toast } from './toast'
 export { default as Tooltip } from './Tooltip'
-export { default as Upload } from './Upload'    
+export { default as Upload } from './Upload'
 export type { AlertProps } from './Alert'
 export type { AvatarProps, AvatarGroupProps } from './Avatar'
 export type { BadgeProps } from './Badge'
 export type { ButtonProps } from './Button'
 export type { CardProps } from './Card'
 export type {
-    CheckboxProps,
-    CheckboxGroupProps,
-    CheckboxGroupValue,
-    CheckboxValue,
+  CheckboxProps,
+  CheckboxGroupProps,
+  CheckboxGroupValue,
+  CheckboxValue,
 } from './Checkbox'
 export type { Config } from './ConfigProvider'
 export type {
-    DatePickerProps,
-    DatePickerRangeProps,
-    DateTimepickerProps,
+  DatePickerProps,
+  DatePickerRangeProps,
+  DateTimepickerProps,
 } from './DatePicker'
 export type { DialogProps } from './Dialog'
 export type { DrawerProps } from './Drawer'
 export type {
-    DropdownProps,
-    DropdownItemProps,
-    DropdownMenuProps,
+  DropdownProps,
+  DropdownItemProps,
+  DropdownMenuProps,
 } from './Dropdown'
 export type { FormContainerProps, FormItemProps } from './Form'
 export type { InputProps } from './Input'
 export type { InputGroupProps, AddonProps } from './InputGroup'
 export type {
-    MenuProps,
-    MenuCollapseProps,
-    MenuGroupProps,
-    MenuItemProps,
+  MenuProps,
+  MenuCollapseProps,
+  MenuGroupProps,
+  MenuItemProps,
 } from './Menu'
 export type { MenuItemProps as BaseMenuItemProps } from './MenuItem'
 export type { NotificationProps } from './Notification'
@@ -82,20 +82,20 @@ export type { SpinnerProps } from './Spinner'
 export type { StepsProps, StepItemProps } from './Steps'
 export type { SwitcherProps } from './Switcher'
 export type {
-    TableProps,
-    TBodyProps,
-    TFootProps,
-    THeadProps,
-    TdProps,
-    ThProps,
-    TrProps,
-    SorterProps,
+  TableProps,
+  TBodyProps,
+  TFootProps,
+  THeadProps,
+  TdProps,
+  ThProps,
+  TrProps,
+  SorterProps,
 } from './Table'
 export type {
-    TabsProps,
-    TabContentProps,
-    TabListProps,
-    TabNavProps,
+  TabsProps,
+  TabContentProps,
+  TabListProps,
+  TabNavProps,
 } from './Tabs'
 export type { TagProps } from './Tag'
 export type { TimeInputProps, TimeInputRangeProps } from './TimeInput'

@@ -1,27 +1,28 @@
 import { useEffect } from 'react'
-import { setDirection, useAppDispatch, useAppSelector } from '@/store'
+
 import type { Direction } from '@/@types/theme'
+import { setDirection, useAppDispatch, useAppSelector } from '@/store'
 
 function useDirection(): [
-    direction: Direction,
-    updateDirection: (dir: Direction) => void
+  direction: Direction,
+  updateDirection: (dir: Direction) => void
 ] {
-    const direction = useAppSelector((state) => state.theme.direction)
+  const direction = useAppSelector(state => state.theme.direction)
 
-    const dispatch = useAppDispatch()
-    const updateDirection = (dir: Direction) => {
-        dispatch(setDirection(dir))
+  const dispatch = useAppDispatch()
+  const updateDirection = (dir: Direction) => {
+    dispatch(setDirection(dir))
+  }
+
+  useEffect(() => {
+    if (window === undefined) {
+      return
     }
+    const root = window.document.documentElement
+    root.setAttribute('dir', direction)
+  }, [direction])
 
-    useEffect(() => {
-        if (window === undefined) {
-            return
-        }
-        const root = window.document.documentElement
-        root.setAttribute('dir', direction)
-    }, [direction])
-
-    return [direction, updateDirection]
+  return [direction, updateDirection]
 }
 
 export default useDirection

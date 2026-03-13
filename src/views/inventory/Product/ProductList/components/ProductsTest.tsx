@@ -1,45 +1,47 @@
-import { Product } from "@/@types/products";
-import supabase from "@/services/Supabase/BaseClient";
-import { useAppSelector } from "@/store";
-import React from "react";
-import MainTable from "./MainTable"; // Asegúrate de ajustar la ruta correcta
-import SubTable from "./SubTable";
-import HandleFeedback from "@/components/ui/FeedBack";
-import { Loading } from "@/components/shared";
+import React from 'react'
 
-export const getProducts = async (id) => {
+import { Product } from '@/@types/products'
+import { Loading } from '@/components/shared'
+import HandleFeedback from '@/components/ui/FeedBack'
+import supabase from '@/services/Supabase/BaseClient'
+import { useAppSelector } from '@/store'
+
+import MainTable from './MainTable' // Asegúrate de ajustar la ruta correcta
+import SubTable from './SubTable'
+
+export const getProducts = async id => {
   try {
     const { data, error } = await supabase
-      .from("products")
+      .from('products')
       .select(
-        "*,supplies(*),variations:product_variations(*,  currency: currency_id(*),attribute_values(value, types: attributes(name)))"
+        '*,supplies(*),variations:product_variations(*,  currency: currency_id(*),attribute_values(value, types: attributes(name)))'
       )
-      .eq("shop_id", id);
+      .eq('shop_id', id)
 
-    if (error) throw error;
+    if (error) throw error
 
-    return data;
+    return data
   } catch (error) {
-    console.error("Error fetching tables:", error);
-    throw error;
+    console.error('Error fetching tables:', error)
+    throw error
   }
-};
+}
 
 const MainComponent = () => {
-  const [products, setProducts] = React.useState<Product[]>([]);
-  const { shopId } = useAppSelector((state) => state.auth.user);
-  const { loading, handleLoadingState } = HandleFeedback();
+  const [products, setProducts] = React.useState<Product[]>([])
+  const { shopId } = useAppSelector(state => state.auth.user)
+  const { loading, handleLoadingState } = HandleFeedback()
   React.useEffect(() => {
-    handleLoadingState(true);
+    handleLoadingState(true)
     getProducts(shopId)
       .then(setProducts)
-      .then(() => handleLoadingState(false));
-  }, []);
+      .then(() => handleLoadingState(false))
+  }, [])
 
   const renderSubComponent = ({ row }) => {
-    const variations = row.original.variations || [];
-    return <SubTable data={variations} />;
-  };
+    const variations = row.original.variations || []
+    return <SubTable data={variations} />
+  }
 
   return (
     <Loading loading={loading}>
@@ -47,12 +49,12 @@ const MainComponent = () => {
         data={products}
         setProducts={setProducts}
         renderRowSubComponent={renderSubComponent}
-        getRowCanExpand={(row) =>
+        getRowCanExpand={row =>
           row.original.variations && row.original.variations.length > 0
         }
       />
     </Loading>
-  );
-};
+  )
+}
 
-export default MainComponent;
+export default MainComponent

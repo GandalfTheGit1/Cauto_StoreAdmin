@@ -1,7 +1,7 @@
-import Tables from "./Components/Tables";
+import Tables from './Components/Tables'
 
 function index() {
-  return <Tables />;
+  return <Tables />
 }
 
-export default index;
+export default index

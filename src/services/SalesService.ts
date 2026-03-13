@@ -1,21 +1,23 @@
-import { useAppSelector } from "@/store";
-import ApiService from "./ApiService";
-import supabase from "./Supabase/BaseClient";
-import dayjs from "dayjs";
+import dayjs from 'dayjs'
+
+import { useAppSelector } from '@/store'
+
+import ApiService from './ApiService'
+import supabase from './Supabase/BaseClient'
 
 export async function apiGetDelievery() {
   return ApiService.fetchData({
-    url: "shops/delievery",
-    method: "get",
-  });
+    url: 'shops/delievery',
+    method: 'get',
+  })
 }
 
 export async function apiPostDelievery(data: string) {
   return ApiService.fetchData({
-    url: "shops/delievery",
-    method: "post",
+    url: 'shops/delievery',
+    method: 'post',
     data,
-  });
+  })
 }
 
 // Función para obtener el reporte de ventas distribuido por intervalos
@@ -24,144 +26,140 @@ export const getSalesReportByIntervals = async (
   startDate,
   endDate
 ) => {
-  const { data, error } = await supabase.rpc("get_sales_report_by_intervals", {
+  const { data, error } = await supabase.rpc('get_sales_report_by_intervals', {
     start_date: startDate,
     intervals: intervals,
     end_date: endDate,
-  });
+  })
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(error.message)
   }
 
   // Mapeo de los datos para adaptarlos al formato esperado
   const salesReportData = {
     series: [
       {
-        name: "Ventas",
-        data: data.map((interval) => interval.sales_count), // Cantidad de ventas por intervalo
+        name: 'Ventas',
+        data: data.map(interval => interval.sales_count), // Cantidad de ventas por intervalo
       },
     ],
-    categories: data.map((interval) => {
+    categories: data.map(interval => {
       // Crear una etiqueta para el intervalo de tiempo
-      const startDate = new Date(interval.interval_start);
-      const endDate = new Date(interval.interval_end);
-      return `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`;
+      const startDate = new Date(interval.interval_start)
+      const endDate = new Date(interval.interval_end)
+      return `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`
     }),
-  };
+  }
 
-  return salesReportData;
-};
+  return salesReportData
+}
 
-export const getDashboardData = async (dates) => {
-  const endDate = dayjs.unix(dates.endDate).toDate().toISOString();
-  const startDate = dayjs.unix(dates.startDate).toDate().toISOString();
+export const getDashboardData = async dates => {
+  const endDate = dayjs.unix(dates.endDate).toDate().toISOString()
+  const startDate = dayjs.unix(dates.startDate).toDate().toISOString()
   //const startDate = new Date(startDate2).toISOString(); // Ajustar el formato
   //const endDate = new Date(endDate2).toISOString();
-  console.log("HOLA", startDate, endDate);
+  console.log('HOLA', startDate, endDate)
   // Obtener todas las órdenes y productos vendidos
   const { data: ordersData, error: ordersError } = await supabase
-    .from("orders")
-    .select("id, total, created_at, status, clients (name, email, phone)")
-    .gte("created_at", startDate) // Filtrar por fecha de inicio
-    .lte("created_at", endDate)
-    .eq("shop_id", dates.shopId); // Filtrar por fecha de fin
+    .from('orders')
+    .select('id, total, created_at, status, clients (name, email, phone)')
+    .gte('created_at', startDate) // Filtrar por fecha de inicio
+    .lte('created_at', endDate)
+    .eq('shop_id', dates.shopId) // Filtrar por fecha de fin
 
-  if (ordersError) throw new Error(ordersError.message);
+  if (ordersError) throw new Error(ordersError.message)
 
   // Filtrar las órdenes completadas ("Pagado a los Gestores")
   const completedOrders = ordersData.filter(
-    (order) => order.status === "Pagado a los Gestores"
-  );
-  const totalCompletedOrders = completedOrders.length;
+    order => order.status === 'Pagado a los Gestores'
+  )
+  const totalCompletedOrders = completedOrders.length
 
   // Calcular el total de ventas (Revenue)
-  const totalRevenue = ordersData.reduce((acc, order) => acc + order.total, 0);
+  const totalRevenue = ordersData.reduce((acc, order) => acc + order.total, 0)
 
   // Obtener productos vendidos y sus variaciones
   const { data: productVariationsData, error: productVariationsError } =
-    await supabase.from("product_variations").select(`
+    await supabase.from('product_variations').select(`
       id, 
       products (id, name, images), 
       supply_variation!inner (cost)
-    `);
+    `)
 
-  if (productVariationsError) throw new Error(productVariationsError.message);
+  if (productVariationsError) throw new Error(productVariationsError.message)
 
   // Obtener insumos y sus variaciones
   const { data: suppliesData, error: suppliesError } = await supabase
-    .from("supplies")
-    .select("id, name, type, supply_variation (cost)");
+    .from('supplies')
+    .select('id, name, type, supply_variation (cost)')
 
-  if (suppliesError) throw new Error(suppliesError.message);
-  const salesReportData = await getSalesReportByIntervals(
-    5,
-    startDate,
-    endDate
-  );
-  console.log(salesReportData);
+  if (suppliesError) throw new Error(suppliesError.message)
+  const salesReportData = await getSalesReportByIntervals(5, startDate, endDate)
+  console.log(salesReportData)
   // Calcular el costo total de los insumos
   const totalSupplyCost = suppliesData.reduce((acc, supply) => {
     const supplyVariationCost = supply.supply_variation.reduce(
       (costAcc, variation) => costAcc + variation.cost,
       0
-    );
-    return acc + supplyVariationCost;
-  }, 0);
+    )
+    return acc + supplyVariationCost
+  }, 0)
 
   // Calcular el ingreso neto (totalRevenue - totalSupplyCost)
-  const netIncome = totalRevenue - totalSupplyCost;
+  const netIncome = totalRevenue - totalSupplyCost
 
   // Placeholder para crecimiento/disminución del ingreso (se puede ajustar con una comparación temporal)
-  const growShrinkIncome = netIncome > 0 ? 5 : -5; // Valor ficticio para ejemplo
-  const growShrinkSupplies = totalSupplyCost > 0 ? 3 : -3; // Valor ficticio
+  const growShrinkIncome = netIncome > 0 ? 5 : -5 // Valor ficticio para ejemplo
+  const growShrinkSupplies = totalSupplyCost > 0 ? 3 : -3 // Valor ficticio
 
   // Obtener órdenes y calcular porcentaje por categoría
   const { data: ordersCategoriesData, error: ordersCategoriesError } =
-    await supabase.rpc("get_orders_count_by_category", {
+    await supabase.rpc('get_orders_count_by_category', {
       start_date: startDate,
       end_date: endDate,
-    }); // Función en Supabase para el cálculo de porcentajes
+    }) // Función en Supabase para el cálculo de porcentajes
 
-  if (ordersCategoriesError) throw new Error(ordersCategoriesError.message);
+  if (ordersCategoriesError) throw new Error(ordersCategoriesError.message)
 
   const salesByCategoriesData = {
-    labels: ordersCategoriesData.map((category) => category.name),
-    data: ordersCategoriesData.map((category) => category.orders_count),
-  };
+    labels: ordersCategoriesData.map(category => category.name),
+    data: ordersCategoriesData.map(category => category.orders_count),
+  }
 
   const { data: supplyCostData, error: supplyCostError } = await supabase.rpc(
-    "get_supply_cost_by_orders",
+    'get_supply_cost_by_orders',
     {
       start_date: startDate,
       end_date: endDate,
     }
-  );
+  )
 
-  console.log("das", supplyCostData);
+  console.log('das', supplyCostData)
 
   if (supplyCostError) {
-    throw new Error(supplyCostError.message);
+    throw new Error(supplyCostError.message)
   }
 
   const supplyCostReportData = {
-    labels: supplyCostData.map((category) => category.supply_description),
-    data: supplyCostData.map((category) => category.total_supply_cost),
-  };
+    labels: supplyCostData.map(category => category.supply_description),
+    data: supplyCostData.map(category => category.total_supply_cost),
+  }
 
   // Obtener productos más vendidos desde Supabase
   const { data: topProductsData, error: topProductsError } = await supabase.rpc(
-    "get_top_selling_products",
+    'get_top_selling_products',
     { start_date: startDate, end_date: endDate }
-  ); // Función RPC en Supabase para obtener los productos más vendidos
-  if (topProductsError) throw new Error(topProductsError.message);
+  ) // Función RPC en Supabase para obtener los productos más vendidos
+  if (topProductsError) throw new Error(topProductsError.message)
 
   const { data: itemsInOrders, error } = await supabase.rpc(
-    "get_total_items_in_completed_orders",
+    'get_total_items_in_completed_orders',
     { start_date: startDate, end_date: endDate }
-  ); // Llama a la función
+  ) // Llama a la función
 
-  console.log("AQUI LLEGAMOS");
+  console.log('AQUI LLEGAMOS')
   // Retornar el dashboard con los datos de insumos y estadísticas actualizadas
   return {
     statisticData: {
@@ -187,7 +185,7 @@ export const getDashboardData = async (dates) => {
         growShrink: 2, //growShrinkSupplies,
       },
     },
-    topProductsData: topProductsData.map((product) => ({
+    topProductsData: topProductsData.map(product => ({
       id: product.id,
       name: product.name,
       img: product.images,
@@ -206,17 +204,17 @@ export const getDashboardData = async (dates) => {
       paymentIdendifier: "Pago Completo",
       totalAmount: order.total,
     })), */,
-  };
-};
+  }
+}
 
 export async function apiGetSalesProducts<T, U extends Record<string, unknown>>(
   data: any
 ) {
   return ApiService.fetchData<T>({
-    url: "products/getFiltered",
-    method: "post",
+    url: '/sales/products',
+    method: 'post',
     data,
-  });
+  })
 }
 
 export async function apiGetProductsFromStoresProducts<
@@ -225,10 +223,10 @@ export async function apiGetProductsFromStoresProducts<
 >() {
   //data: U
   return ApiService.fetchData<T>({
-    url: "shops/productsFromStores",
-    method: "get",
+    url: 'shops/productsFromStores',
+    method: 'get',
     // data,
-  });
+  })
 }
 
 export async function apiDeleteSalesProducts<
@@ -236,20 +234,20 @@ export async function apiDeleteSalesProducts<
   U extends Record<string, unknown>
 >(data: U) {
   return ApiService.fetchData<T>({
-    url: "products",
-    method: "delete",
+    url: '/sales/products/delete',
+    method: 'delete',
     data,
-  });
+  })
 }
 
 export async function apiGetSalesProduct<T, U extends Record<string, unknown>>(
   params: U
 ) {
   return ApiService.fetchData<T>({
-    url: "products",
-    method: "get",
+    url: '/sales/product',
+    method: 'get',
     params,
-  });
+  })
 }
 
 export async function apiPutSalesProduct<T, U extends Record<string, unknown>>(
@@ -257,19 +255,19 @@ export async function apiPutSalesProduct<T, U extends Record<string, unknown>>(
   params: any
 ) {
   return ApiService.fetchData<T>({
-    url: "products",
-    method: "put",
+    url: '/sales/products/update',
+    method: 'put',
     data,
     params,
-  });
+  })
 }
 
 export async function apiProductCreate(values: any) {
   return ApiService.fetchData({
-    url: "/products/",
-    method: "post",
+    url: '/sales/products/create',
+    method: 'post',
     data: values,
-  });
+  })
 }
 
 /* export async function apiCreateSalesProduct<
@@ -287,10 +285,10 @@ export async function apiGetSalesOrders<T, U extends Record<string, unknown>>(
   params: U
 ) {
   return ApiService.fetchData<T>({
-    url: "/sales/orders",
-    method: "get",
+    url: '/sales/orders',
+    method: 'get',
     params,
-  });
+  })
 }
 
 export async function apiDeleteSalesOrders<
@@ -298,10 +296,10 @@ export async function apiDeleteSalesOrders<
   U extends Record<string, unknown>
 >(data: U) {
   return ApiService.fetchData<T>({
-    url: "/sales/orders/delete",
-    method: "delete",
+    url: '/sales/orders/delete',
+    method: 'delete',
     data,
-  });
+  })
 }
 
 export async function apiGetSalesOrderDetails<
@@ -309,8 +307,8 @@ export async function apiGetSalesOrderDetails<
   U extends Record<string, unknown>
 >(params: U) {
   return ApiService.fetchData<T>({
-    url: "/sales/orders-details",
-    method: "get",
+    url: '/sales/orders-details',
+    method: 'get',
     params,
-  });
+  })
 }

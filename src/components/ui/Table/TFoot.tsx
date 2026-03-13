@@ -1,26 +1,21 @@
-import { forwardRef } from 'react'
 import classNames from 'classnames'
+import { forwardRef } from 'react'
 import type { ComponentPropsWithRef, ElementType } from 'react'
 
 export interface TFootProps extends ComponentPropsWithRef<'tfoot'> {
-    asElement?: ElementType
+  asElement?: ElementType
 }
 
 const TFoot = forwardRef<HTMLElement, TFootProps>((props, ref) => {
-    const {
-        asElement: Component = 'tfoot',
-        children,
-        className,
-        ...rest
-    } = props
+  const { asElement: Component = 'tfoot', children, className, ...rest } = props
 
-    const tBodyClass = classNames(Component !== 'tfoot' && 'tfoot', className)
+  const tBodyClass = classNames(Component !== 'tfoot' && 'tfoot', className)
 
-    return (
-        <Component className={tBodyClass} {...rest} ref={ref}>
-            {children}
-        </Component>
-    )
+  return (
+    <Component className={tBodyClass} {...rest} ref={ref}>
+      {children}
+    </Component>
+  )
 })
 
 TFoot.displayName = 'TFoot'

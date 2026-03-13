@@ -1,14 +1,15 @@
-import Avatar from '@/components/ui/Avatar'
 import { HiOutlineUser } from 'react-icons/hi'
 
+import Avatar from '@/components/ui/Avatar'
+
 const Type = () => {
-    return (
-        <div className="flex items-center">
-            <Avatar className="mr-4">AT</Avatar>
-            <Avatar className="mr-4" icon={<HiOutlineUser />} />
-            <Avatar className="mr-4" src="/img/avatars/thumb-1.jpg" />
-        </div>
-    )
+  return (
+    <div className='flex items-center'>
+      <Avatar className='mr-4'>AT</Avatar>
+      <Avatar className='mr-4' icon={<HiOutlineUser />} />
+      <Avatar className='mr-4' src='/img/avatars/thumb-1.jpg' />
+    </div>
+  )
 }
 
 export default Type

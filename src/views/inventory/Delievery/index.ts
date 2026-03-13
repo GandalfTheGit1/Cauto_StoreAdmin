@@ -1,3 +1,3 @@
-import DelieveryWrapper from "./DelieveryWrapper";
+import DelieveryWrapper from './DelieveryWrapper'
 
 export default DelieveryWrapper

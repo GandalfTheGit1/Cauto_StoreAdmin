@@ -1,11 +1,7 @@
-import FormDialog from "../Form";
-import { apiCreateCategory } from "@/services/inventory/CategoryService";
+import { apiCreateCategory } from '@/services/inventory/CategoryService'
 
-export default function CreateCategoryElement (){
-    return (
-        <FormDialog
-            apiService={apiCreateCategory}
-            defaultValue=""
-        />
-    )
+import FormDialog from '../Form'
+
+export default function CreateCategoryElement() {
+  return <FormDialog apiService={apiCreateCategory} defaultValue='' />
 }

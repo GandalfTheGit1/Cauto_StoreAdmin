@@ -6,6 +6,7 @@ export * from './slices/base'
 export * from './slices/inventory/makeOrderSlice'
 export * from './slices/theme/themeSlice'
 export * from './slices/locale/localeSlice'
+export * from './slices/preferences'
 export * from './rootReducer'
 export * from './hook'
 export default store

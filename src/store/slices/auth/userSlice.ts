@@ -1,33 +1,35 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { SLICE_BASE_NAME } from "./constants";
-import { User } from "@/@types/auth";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+
+import { User } from '@/@types/auth'
+
+import { SLICE_BASE_NAME } from './constants'
 
 export const initialState: User = {
   id: null,
-  name: "",
-  email: "",
-  phone: "",
+  name: '',
+  email: '',
+  phone: '',
   authority: [],
-  shopId: "",
-  sellersShops: []
-};
+  shopId: '',
+  sellersShops: [],
+}
 
 const userSlice = createSlice({
   name: `${SLICE_BASE_NAME}/user`,
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<User>) {
-      state.id = action.payload?.id;
-      state.email = action.payload?.email;
-      state.name = action.payload?.name;
-      state.name = action.payload?.name;
-      state.phone = action.payload?.phone;
-      state.authority = action.payload?.authority;
-      state.shopId = action.payload?.shopId;
+      state.id = action.payload?.id
+      state.email = action.payload?.email
+      state.name = action.payload?.name
+      state.name = action.payload?.name
+      state.phone = action.payload?.phone
+      state.authority = action.payload?.authority
+      state.shopId = action.payload?.shopId
       state.sellersShops = action.payload?.sellersShops
     },
   },
-});
+})
 
-export const { setUser } = userSlice.actions;
-export default userSlice.reducer;
+export const { setUser } = userSlice.actions
+export default userSlice.reducer

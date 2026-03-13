@@ -1,96 +1,97 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import supabase from "@/services/Supabase/BaseClient";
-import { supabaseService } from "@/services/Supabase/AttributeService";
-import UploadWidget from "@/views/inventory/Product/ProductForm/components/Images";
-import Prices from "@/components/ui/Prices";
-import { useAppSelector } from "@/store";
+import { ChevronDown, ChevronRight } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
+
+import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import Prices from '@/components/ui/Prices'
+import { supabaseService } from '@/services/Supabase/AttributeService'
+import supabase from '@/services/Supabase/BaseClient'
+import { useAppSelector } from '@/store'
+import UploadWidget from '@/views/inventory/Product/ProductForm/components/Images'
 
 interface Product {
-  id: number;
-  name: string;
-  variations: ProductVariation[];
+  id: number
+  name: string
+  variations: ProductVariation[]
 }
 
 interface ProductVariation {
-  id: number;
-  name: string;
-  offer_price: number;
-  price: number;
+  id: number
+  name: string
+  offer_price: number
+  price: number
 }
 
 interface Currency {
-  id: number;
-  name: string;
-  exchange_rate: number;
+  id: number
+  name: string
+  exchange_rate: number
 }
 
 interface Offer {
-  id?: number;
-  name: string;
-  description: string;
-  long_description: string;
-  general_offer_price: number;
-  startDate: string;
-  endDate: string;
-  shopId: number;
-  products: OfferProduct[];
+  id?: number
+  name: string
+  description: string
+  long_description: string
+  general_offer_price: number
+  startDate: string
+  endDate: string
+  shopId: number
+  products: OfferProduct[]
 }
 
 interface OfferProduct {
-  id?: number;
-  productId: number;
-  variations: OfferProductVariation[];
+  id?: number
+  productId: number
+  variations: OfferProductVariation[]
 }
 
 interface OfferProductVariation {
-  id?: number;
-  variationId: number;
-  offer_price: number;
-  currencyId: number;
-  required_quantity: number;
+  id?: number
+  variationId: number
+  offer_price: number
+  currencyId: number
+  required_quantity: number
 }
 
 export default function OfferForm() {
-  const [currency, setCurrency] = useState([]);
+  const [currency, setCurrency] = useState([])
 
-  const [error, updateError] = useState();
-  const [localImages, setLocalImages] = useState([]);
-  const { id } = useParams<{ id: string }>();
+  const [error, updateError] = useState()
+  const [localImages, setLocalImages] = useState([])
+  const { id } = useParams<{ id: string }>()
   const [offer, setOffer] = useState<Offer>({
-    name: "",
-    description: "",
-    long_description: "",
+    name: '',
+    description: '',
+    long_description: '',
     general_offer_price: 0,
-    startDate: "",
-    endDate: "",
+    startDate: '',
+    endDate: '',
     shopId: 1,
     products: [],
-  });
+  })
   const [expandedProducts, setExpandedProducts] = useState<
     Record<number, boolean>
-  >({});
+  >({})
   const [selectedProducts, setSelectedProducts] = useState<
     Record<number, boolean>
-  >({});
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  >({})
+  const [products, setProducts] = useState<Product[]>([])
+  const [loading, setLoading] = useState(true)
   useEffect(() => {
-    fetchProducts();
-    supabaseService.getCurrencies().then(setCurrency);
+    fetchProducts()
+    supabaseService.getCurrencies().then(setCurrency)
     if (id) {
-      fetchOffer(parseInt(id));
+      fetchOffer(parseInt(id))
     } else {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [id]);
+  }, [id])
 
   const fetchProducts = async () => {
     const { data, error } = await supabase
-      .from("products")
+      .from('products')
       .select(
         `
         id,
@@ -103,17 +104,17 @@ export default function OfferForm() {
         )
       `
       )
-      .eq("shop_id", shopId);
+      .eq('shop_id', shopId)
     if (error) {
-      console.error("Error fetching products:", error);
+      console.error('Error fetching products:', error)
     } else {
-      setProducts(data || []);
+      setProducts(data || [])
     }
-  };
+  }
 
   const fetchOffer = async (offerId: number) => {
     const { data, error } = await supabase
-      .from("offers")
+      .from('offers')
       .select(
         `
             id,
@@ -144,12 +145,12 @@ export default function OfferForm() {
             )
           `
       )
-      .eq("id", offerId)
-      .eq("shop_id", shopId)
-      .single();
+      .eq('id', offerId)
+      .eq('shop_id', shopId)
+      .single()
 
     if (error) {
-      console.error("Error fetching offer:", error);
+      console.error('Error fetching offer:', error)
     } else if (data) {
       const {
         start_date,
@@ -157,25 +158,25 @@ export default function OfferForm() {
         images,
         products = [],
         variations = [],
-      } = data;
+      } = data
 
-      const formattedProducts = [];
-      const formattedVariations = [];
+      const formattedProducts = []
+      const formattedVariations = []
 
       // Emulando la selección de productos y creando el array formateado
-      products.forEach((product) => {
-        const productId = product.id;
+      products.forEach(product => {
+        const productId = product.id
         formattedProducts.push({
           id: productId,
           name: product.name,
-        });
+        })
 
         // Emulando handleProductSelection
-        setSelectedProducts((prev) => ({ ...prev, [productId]: true }));
-      });
+        setSelectedProducts(prev => ({ ...prev, [productId]: true }))
+      })
 
       // Emulando la selección de variaciones y creando el array formateado
-      variations.forEach((v) => {
+      variations.forEach(v => {
         const variationData = {
           id: v.variation.id,
           name: v.variation.name,
@@ -183,30 +184,30 @@ export default function OfferForm() {
           offerPrice: v.offer_price,
           currency: v.currency.name,
           currencyId: v.currency.id,
-        };
+        }
 
-        formattedVariations.push(variationData);
+        formattedVariations.push(variationData)
 
         // Emulando handleUpdate para cada propiedad necesaria
-        setOffersVariations((prev) => {
+        setOffersVariations(prev => {
           const data = [
-            ...prev.filter((ov) => ov.variationId !== variationData.id),
+            ...prev.filter(ov => ov.variationId !== variationData.id),
             {
               variationId: variationData.id,
               offer_price: variationData.offerPrice,
               currencyId: variationData.currencyId,
               required_quantity: variationData.requiredQuantity,
             },
-          ];
-          return data;
-        });
+          ]
+          return data
+        })
 
         // Emulando handleVariationSelection
-        setSelectedVariations((prev) => ({
+        setSelectedVariations(prev => ({
           ...prev,
           [variationData.id]: true,
-        }));
-      });
+        }))
+      })
 
       const formattedOffer = {
         ...data,
@@ -215,55 +216,55 @@ export default function OfferForm() {
         images,
         products: formattedProducts,
         variations: formattedVariations,
-      };
+      }
 
-      setOffer(formattedOffer);
-      setLocalImages(images);
+      setOffer(formattedOffer)
+      setLocalImages(images)
     }
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    const { name, value } = e.target;
-    setOffer((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setOffer(prev => ({ ...prev, [name]: value }))
+  }
 
   const toggleProductExpansion = (productId: number) => {
-    setExpandedProducts((prev) => ({ ...prev, [productId]: !prev[productId] }));
-  };
+    setExpandedProducts(prev => ({ ...prev, [productId]: !prev[productId] }))
+  }
 
   const handleProductSelection = async (
     productId: number,
     isChecked: boolean
   ) => {
-    console.log(selectedProducts, offer);
-    setSelectedProducts((prev) => ({ ...prev, [productId]: isChecked }));
+    console.log(selectedProducts, offer)
+    setSelectedProducts(prev => ({ ...prev, [productId]: isChecked }))
     if (isChecked) {
-      setOffer((prev) => ({
+      setOffer(prev => ({
         ...prev,
         products: [...prev.products, { id: productId }],
-      }));
+      }))
     } else {
-      setOffer((prev) => ({
+      setOffer(prev => ({
         ...prev,
-        products: prev.products.filter((p) => p.id !== productId),
-      }));
+        products: prev.products.filter(p => p.id !== productId),
+      }))
     }
-  };
-  const { shopId } = useAppSelector((state) => state.auth.user);
-  const [selectedVariations, setSelectedVariations] = useState({});
-  const [offersVariations, setOffersVariations] = useState([]);
+  }
+  const { shopId } = useAppSelector(state => state.auth.user)
+  const [selectedVariations, setSelectedVariations] = useState({})
+  const [offersVariations, setOffersVariations] = useState([])
 
   const handleVariationSelection = async (
     variationId: number,
     isChecked: boolean
   ) => {
-    setSelectedVariations((prev) => ({ ...prev, [variationId]: isChecked }));
-    console.log(selectedVariations, offersVariations);
+    setSelectedVariations(prev => ({ ...prev, [variationId]: isChecked }))
+    console.log(selectedVariations, offersVariations)
     if (isChecked) {
-      setOffersVariations((prev) => [
+      setOffersVariations(prev => [
         ...prev,
         {
           variationId,
@@ -271,51 +272,51 @@ export default function OfferForm() {
           currencyId: 1,
           required_quantity: 0,
         },
-      ]);
+      ])
     } else {
-      setOffersVariations((prev) =>
-        prev.filter((v) => v.variationId !== variationId)
-      );
+      setOffersVariations(prev =>
+        prev.filter(v => v.variationId !== variationId)
+      )
     }
-  };
+  }
   const calculateTotalOfferPrice = () => {
     // Filter offersVariations to get only the selected variations
     const selectedVariations2 = Object.keys(selectedVariations)
-      .filter((variationId) => selectedVariations[variationId])
-      .map(Number);
+      .filter(variationId => selectedVariations[variationId])
+      .map(Number)
 
-    const selectedOffersVariations = offersVariations.filter((v) =>
+    const selectedOffersVariations = offersVariations.filter(v =>
       selectedVariations2.includes(v.variationId)
-    );
+    )
 
     // Calculate the sum of offer prices
     const totalOfferPrice = selectedOffersVariations.reduce((acc, current) => {
       // For each selected variation, add its offer price to the accumulator
-      return acc + current.offer_price;
-    }, 0);
+      return acc + current.offer_price
+    }, 0)
 
     // Return the total offer price
-    return totalOfferPrice;
-  };
+    return totalOfferPrice
+  }
 
   const handleUpdate = (variationId: number, target) => {
-    console.log("SOL", offersVariations, { [target.name]: target.value });
-    setOffersVariations((prev) => {
-      const ta = prev.map((v) => {
+    console.log('SOL', offersVariations, { [target.name]: target.value })
+    setOffersVariations(prev => {
+      const ta = prev.map(v => {
         const da =
           v.variationId == variationId
             ? { ...v, [target.name]: parseFloat(target.value) || 0 }
-            : v;
-        console.log(da.offer_price, "Da");
-        return da;
-      });
-      console.log(ta, "ta");
-      return ta;
-    });
-  };
+            : v
+        console.log(da.offer_price, 'Da')
+        return da
+      })
+      console.log(ta, 'ta')
+      return ta
+    })
+  }
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+    e.preventDefault()
+    setLoading(true)
 
     const offerData = {
       name: offer.name,
@@ -326,124 +327,124 @@ export default function OfferForm() {
       end_date: offer.endDate,
       shop_id: shopId,
       images: localImages,
-    };
+    }
 
-    let offerId: number;
+    let offerId: number
 
     if (id) {
       // Update existing offer
       const { data, error } = await supabase
-        .from("offers")
+        .from('offers')
         .update(offerData)
-        .eq("id", id)
-        .select();
+        .eq('id', id)
+        .select()
 
       if (error) {
-        console.error("Error updating offer:", error);
-        setLoading(false);
-        return;
+        console.error('Error updating offer:', error)
+        setLoading(false)
+        return
       }
-      offerId = parseInt(id);
+      offerId = parseInt(id)
     } else {
       // Create new offer
       const { data, error } = await supabase
-        .from("offers")
+        .from('offers')
         .insert(offerData)
-        .select("*");
+        .select('*')
 
       if (error) {
-        console.error("Error creating offer:", error);
-        setLoading(false);
-        return;
+        console.error('Error creating offer:', error)
+        setLoading(false)
+        return
       }
-      offerId = data![0].id;
+      offerId = data![0].id
     }
 
     // Evitando Repeticiones
-    await supabase.from("offer_products").delete().eq("offer_id", offerId);
+    await supabase.from('offer_products').delete().eq('offer_id', offerId)
 
     // Evitando Repeticiones
     await supabase
-      .from("offer_product_variations")
+      .from('offer_product_variations')
       .delete()
-      .eq("offer_id", offerId);
+      .eq('offer_id', offerId)
 
-    console.log(offer);
+    console.log(offer)
     // Insert new offer products and variations
     for (const product of offer.products) {
       const { data: offerProductData, error: offerProductError } =
         await supabase
-          .from("offer_products")
+          .from('offer_products')
           .insert({ offer_id: offerId, product_id: product.id })
-          .select();
+          .select()
 
       if (offerProductError) {
-        console.error("Error inserting offer product:", offerProductError);
-        continue;
+        console.error('Error inserting offer product:', offerProductError)
+        continue
       }
 
-      console.log(product.id);
+      console.log(product.id)
     }
 
     // Insertar nuevas variaciones
     const selectedVariations2 = Object.keys(selectedVariations)
-      .filter((variationId) => selectedVariations[variationId])
-      .map(Number);
+      .filter(variationId => selectedVariations[variationId])
+      .map(Number)
 
-    const variationsToInsert = offersVariations.filter((v) =>
+    const variationsToInsert = offersVariations.filter(v =>
       selectedVariations2.includes(v.variationId)
-    );
+    )
 
     const { error: insertError } = await supabase
-      .from("offer_product_variations")
+      .from('offer_product_variations')
       .insert(
-        variationsToInsert.map((v) => ({
+        variationsToInsert.map(v => ({
           product_variation_id: v.variationId,
           offer_price: v.offer_price,
           currency_id: v.currencyId,
           offer_id: offerId,
           required_quantity: v.required_quantity || 0,
         }))
-      );
+      )
 
     if (insertError) {
-      console.error("Error inserting offer product variations:", insertError);
+      console.error('Error inserting offer product variations:', insertError)
     }
-    console.log(selectedVariations);
+    console.log(selectedVariations)
 
-    setLoading(false);
-  };
+    setLoading(false)
+  }
 
   const handleImageUpload = async (error, result, widget) => {
-    console.log("VIDEO");
-    console.log(result, error);
+    console.log('VIDEO')
+    console.log(result, error)
 
     if (error) {
-      updateError(error);
+      updateError(error)
       widget.close({
         quiet: true,
-      });
-      return;
+      })
+      return
     }
-    setLocalImages((prevImages) => [...prevImages, result]);
+    setLocalImages(prevImages => [...prevImages, result])
 
     // Actualizar el estado con una imagen de carga
-  };
+  }
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>Loading...</div>
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="flex flex-col space-y-2">
-        {" "}
-        <div className="group relative rounded border p-2 flex">
-          {localImages.map((e) => (
+    <form onSubmit={handleSubmit} className='space-y-6'>
+      <div className='flex flex-col space-y-2'>
+        {' '}
+        <div className='group relative rounded border p-2 flex'>
+          {localImages.map(e => (
             <img
-              className="rounded max-h-[140px] max-w-full"
+              className='rounded max-h-[140px] max-w-full'
               src={e}
-              alt={""}
+              alt={''}
             />
           ))}
         </div>
@@ -452,34 +453,34 @@ export default function OfferForm() {
       <h5>Imagenes</h5>
       <UploadWidget
         onUpload={(error, result, widget) => {
-          const img = result?.info?.secure_url;
-          handleImageUpload(error, img, widget);
+          const img = result?.info?.secure_url
+          handleImageUpload(error, img, widget)
         }}
       >
         {({ open }) => {
           function handleOnClick(e) {
-            e.preventDefault();
-            open();
+            e.preventDefault()
+            open()
           }
           return (
-            <label className="w-16 h-16 flex items-center justify-center bg-gray-200 rounded cursor-pointer">
+            <label className='w-16 h-16 flex items-center justify-center bg-gray-200 rounded cursor-pointer'>
               <button onClick={handleOnClick}>
-                <span className="text-4xl text-gray-500">+</span>
+                <span className='text-4xl text-gray-500'>+</span>
               </button>
             </label>
-          );
+          )
         }}
       </UploadWidget>
       <div>
         <label
-          htmlFor="name"
-          className="block text-sm font-medium text-gray-700"
+          htmlFor='name'
+          className='block text-sm font-medium text-gray-700'
         >
           Nombre de la oferta
         </label>
         <Input
-          id="name"
-          name="name"
+          id='name'
+          name='name'
           value={offer.name}
           onChange={handleInputChange}
           required
@@ -488,14 +489,14 @@ export default function OfferForm() {
 
       <div>
         <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
+          htmlFor='description'
+          className='block text-sm font-medium text-gray-700'
         >
           Descripción
         </label>
         <Input
-          id="description"
-          name="description"
+          id='description'
+          name='description'
           value={offer.description}
           onChange={handleInputChange}
           rows={3}
@@ -504,14 +505,14 @@ export default function OfferForm() {
 
       <div>
         <label
-          htmlFor="description"
-          className="block text-sm font-medium text-gray-700"
+          htmlFor='description'
+          className='block text-sm font-medium text-gray-700'
         >
           Descripción
         </label>
         <Input
-          id="long_description"
-          name="long_description"
+          id='long_description'
+          name='long_description'
           value={offer.long_description}
           onChange={handleInputChange}
           textArea={true}
@@ -519,18 +520,18 @@ export default function OfferForm() {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className='grid grid-cols-2 gap-4'>
         <div>
           <label
-            htmlFor="startDate"
-            className="block text-sm font-medium text-gray-700"
+            htmlFor='startDate'
+            className='block text-sm font-medium text-gray-700'
           >
             Fecha de inicio
           </label>
           <Input
-            id="startDate"
-            name="startDate"
-            type="date"
+            id='startDate'
+            name='startDate'
+            type='date'
             value={offer.startDate}
             onChange={handleInputChange}
             required
@@ -538,15 +539,15 @@ export default function OfferForm() {
         </div>
         <div>
           <label
-            htmlFor="endDate"
-            className="block text-sm font-medium text-gray-700"
+            htmlFor='endDate'
+            className='block text-sm font-medium text-gray-700'
           >
             Fecha de fin
           </label>
           <Input
-            id="endDate"
-            name="endDate"
-            type="date"
+            id='endDate'
+            name='endDate'
+            type='date'
             value={offer.endDate}
             onChange={handleInputChange}
             required
@@ -555,58 +556,58 @@ export default function OfferForm() {
       </div>
 
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Productos</h3>
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <h3 className='text-lg font-medium text-gray-900 mb-2'>Productos</h3>
+        <table className='min-w-full divide-y divide-gray-200'>
+          <thead className='bg-gray-50'>
             <tr>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
               >
                 Seleccionar
               </th>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
               >
                 Nombre del producto
               </th>
               <th
-                scope="col"
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                scope='col'
+                className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
               >
                 Expandir
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className='bg-white divide-y divide-gray-200'>
             {products.map((product, pkey) => (
               <React.Fragment key={pkey}>
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className='px-6 py-4 whitespace-nowrap'>
                     <input
-                      type="checkbox"
+                      type='checkbox'
                       checked={selectedProducts[product.id] || false}
-                      onChange={(e) =>
+                      onChange={e =>
                         handleProductSelection(product.id, e.target.checked)
                       }
-                      className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                      className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded'
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className='px-6 py-4 whitespace-nowrap'>
                     {product.name}
                   </td>
 
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className='px-6 py-4 whitespace-nowrap'>
                     <button
-                      type="button"
+                      type='button'
                       onClick={() => toggleProductExpansion(product.id)}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className='text-indigo-600 hover:text-indigo-900'
                     >
                       {expandedProducts[product.id] ? (
-                        <ChevronDown className="h-5 w-5" />
+                        <ChevronDown className='h-5 w-5' />
                       ) : (
-                        <ChevronRight className="h-5 w-5" />
+                        <ChevronRight className='h-5 w-5' />
                       )}
                     </button>
                   </td>
@@ -614,139 +615,140 @@ export default function OfferForm() {
                 {expandedProducts[product.id] && (
                   <tr>
                     <td colSpan={4}>
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                      <table className='min-w-full divide-y divide-gray-200'>
+                        <thead className='bg-gray-50'>
                           <tr>
                             <th
-                              scope="col"
-                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              scope='col'
+                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                             />
                             <th
-                              scope="col"
-                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              scope='col'
+                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                             >
                               Seleccionar
                             </th>
                             <th
-                              scope="col"
-                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              scope='col'
+                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                             >
                               Variación
                             </th>
                             <th
-                              scope="col"
-                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              scope='col'
+                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                             >
-                              Precio por Unidad{" "}
+                              Precio por Unidad{' '}
                             </th>
                             <th
-                              scope="col"
-                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              scope='col'
+                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                             >
-                              Coste                            </th>
+                              Coste{' '}
+                            </th>
                             <th
-                              scope="col"
-                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              scope='col'
+                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                             >
                               Precio de oferta
                             </th>
                             <th
-                              scope="col"
-                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              scope='col'
+                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                             >
                               Cantidad Límite a Comprar
                             </th>
                             <th
-                              scope="col"
-                              className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                              scope='col'
+                              className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
                             >
                               Moneda
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className='bg-white divide-y divide-gray-200'>
                           {product.variations.map((variation, key) => {
                             const ov = offersVariations.find(
-                              (ov) => ov.variationId == variation.id
-                            );
+                              ov => ov.variationId == variation.id
+                            )
                             console.log(
                               !selectedVariations[variation.id],
                               !selectedProducts[product.id],
                               ov
-                            );
+                            )
                             return (
                               <tr key={key}>
-                                <td className="px-6 py-4 whitespace-nowrap" />
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className='px-6 py-4 whitespace-nowrap' />
+                                <td className='px-6 py-4 whitespace-nowrap'>
                                   <input
-                                    type="checkbox"
+                                    type='checkbox'
                                     checked={
                                       selectedVariations[variation.id] || false
                                     }
-                                    onChange={(e) =>
+                                    onChange={e =>
                                       handleVariationSelection(
                                         variation.id,
                                         e.target.checked
                                       )
                                     }
-                                    className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                                    className='focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded'
                                   />
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className='px-6 py-4 whitespace-nowrap'>
                                   {variation.name}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className='px-6 py-4 whitespace-nowrap'>
                                   {variation.price}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className='px-6 py-4 whitespace-nowrap'>
                                   {variation.supply_variation
-                                    .map((sv) => sv.cost)
+                                    .map(sv => sv.cost)
                                     .filter(Boolean)
                                     .reduce((acc, current) => acc + current)}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className='px-6 py-4 whitespace-nowrap'>
                                   <input
-                                    type="number"
+                                    type='number'
                                     disabled={
                                       !selectedVariations[variation.id] &&
                                       !selectedProducts[product.id]
                                     }
-                                    onChange={(e) =>
+                                    onChange={e =>
                                       handleUpdate(variation.id, e.target)
                                     }
-                                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                    className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                                     value={ov?.offer_price}
-                                    name="offer_price"
+                                    name='offer_price'
                                   />
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className='px-6 py-4 whitespace-nowrap'>
                                   <input
-                                    type="number"
-                                    name="required_quantity"
+                                    type='number'
+                                    name='required_quantity'
                                     disabled={
                                       !selectedVariations[variation.id] &&
                                       !selectedProducts[product.id]
                                     }
-                                    onChange={(e) =>
+                                    onChange={e =>
                                       handleUpdate(variation.id, e.target)
                                     }
                                     value={ov?.required_quantity}
-                                    className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                                    className='mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md'
                                   />
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
+                                <td className='px-6 py-4 whitespace-nowrap'>
                                   <select
                                     disabled={
                                       !selectedVariations[variation.id] &&
                                       !selectedProducts[product.id]
                                     }
                                     //value={offer.products[pkey].variations[key].currencyId}
-                                    onChange={(e) =>
+                                    onChange={e =>
                                       handleUpdate(variation.id, e.target)
                                     }
                                     value={ov?.currencyId}
-                                    name="currencyId"
-                                    className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                    name='currencyId'
+                                    className='mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
                                   >
                                     {currency.map((currency, k) => (
                                       <option key={k} value={currency.id}>
@@ -756,7 +758,7 @@ export default function OfferForm() {
                                   </select>
                                 </td>
                               </tr>
-                            );
+                            )
                           })}
                         </tbody>
                       </table>
@@ -769,9 +771,9 @@ export default function OfferForm() {
         </table>
       </div>
       <Button
-        type="button"
+        type='button'
         onClick={() =>
-          setOffer((prev) => ({
+          setOffer(prev => ({
             ...prev,
             general_offer_price: calculateTotalOfferPrice(),
           }))
@@ -779,12 +781,12 @@ export default function OfferForm() {
       >
         Ver Precio Final
       </Button>
-      <div className="flex">
+      <div className='flex'>
         <Prices price={offer.general_offer_price} />
       </div>
-      <Button type="submit" disabled={loading}>
-        {id ? "Actualizar Oferta" : "Crear Oferta"}
+      <Button type='submit' disabled={loading}>
+        {id ? 'Actualizar Oferta' : 'Crear Oferta'}
       </Button>
     </form>
-  );
+  )
 }

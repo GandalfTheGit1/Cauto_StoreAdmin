@@ -1,24 +1,25 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import UploadWidget from "@/views/inventory/Product/ProductForm/components/Images";
-import supabase from "@/services/Supabase/BaseClient";
-import { useAppSelector } from "@/store";
-import HandleFeedback from "@/components/ui/FeedBack";
+import { useState } from 'react'
+
+import { Button } from '@/components/ui/Button'
+import HandleFeedback from '@/components/ui/FeedBack'
+import { Input } from '@/components/ui/Input'
+import supabase from '@/services/Supabase/BaseClient'
+import { useAppSelector } from '@/store'
+import UploadWidget from '@/views/inventory/Product/ProductForm/components/Images'
 export const createSlide = async (slide: Slide): Promise<Slide> => {
   try {
-    const { data, error } = await supabase.from("slides").insert(slide);
+    const { data, error } = await supabase.from('slides').insert(slide)
 
-    if (error) throw error;
+    if (error) throw error
 
-    return data;
+    return data
   } catch (error) {
-    console.error("Error creating slide:", error);
-    throw error;
+    console.error('Error creating slide:', error)
+    throw error
   }
-};
+}
 
 export const updateSlide = async (
   id: string,
@@ -26,117 +27,117 @@ export const updateSlide = async (
 ): Promise<Slide> => {
   try {
     const { data, error } = await supabase
-      .from("slides")
+      .from('slides')
       .update(slide)
-      .eq("id", id);
+      .eq('id', id)
 
-    if (error) throw error;
+    if (error) throw error
 
-    return data;
+    return data
   } catch (error) {
-    console.error("Error updating slide:", error);
-    throw error;
+    console.error('Error updating slide:', error)
+    throw error
   }
-};
+}
 interface Slide {
-  name: string;
-  shop_id: string | number;
-  images: string[];
+  name: string
+  shop_id: string | number
+  images: string[]
 }
 
 export default function SlideCreate() {
   const [slide, setSlide] = useState<Slide>({
-    name: "",
-    images: [""],
-    shop_id: "",
-  });
-  const { shopId } = useAppSelector((state) => state.auth.user);
-  const [error, updateError] = useState();
-  const [localImages, setLocalImages] = useState([]);
-  const { handleSuccess, handleLoading } = HandleFeedback();
+    name: '',
+    images: [''],
+    shop_id: '',
+  })
+  const { shopId } = useAppSelector(state => state.auth.user)
+  const [error, updateError] = useState()
+  const [localImages, setLocalImages] = useState([])
+  const { handleSuccess, handleLoading } = HandleFeedback()
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault()
     try {
-      handleLoading(true);
-      const upload = slide;
-      upload.images = localImages;
-      upload.shop_id = shopId;
-      await createSlide(slide);
-      handleSuccess("Exito en Guardar Diapositivas.");
-      handleLoading(false);
+      handleLoading(true)
+      const upload = slide
+      upload.images = localImages
+      upload.shop_id = shopId
+      await createSlide(slide)
+      handleSuccess('Exito en Guardar Diapositivas.')
+      handleLoading(false)
     } catch (error) {
-      console.error("Error creating slide:", error);
+      console.error('Error creating slide:', error)
     }
-  };
+  }
 
   const handleImageUpload = async (error, result, widget) => {
-    console.log("VIDEO");
-    console.log(result, error);
+    console.log('VIDEO')
+    console.log(result, error)
 
     if (error) {
-      updateError(error);
+      updateError(error)
       widget.close({
         quiet: true,
-      });
-      return;
+      })
+      return
     }
-    setLocalImages((prevImages) => [...prevImages, result]);
+    setLocalImages(prevImages => [...prevImages, result])
 
     // Actualizar el estado con una imagen de carga
-  };
+  }
 
   const onDragEnd = (result: any) => {
     if (!result.destination) {
-      return;
+      return
     }
 
-    const items = Array.from(localImages);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
+    const items = Array.from(localImages)
+    const [reorderedItem] = items.splice(result.source.index, 1)
+    items.splice(result.destination.index, 0, reorderedItem)
 
-    setLocalImages(items);
-  };
+    setLocalImages(items)
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className='container mx-auto p-4'>
+      <form onSubmit={handleSubmit} className='space-y-4'>
         <div>
-          <label htmlFor="name">Nombre</label>
+          <label htmlFor='name'>Nombre</label>
           <Input
-            id="name"
+            id='name'
             value={slide.name}
-            onChange={(e) => setSlide({ ...slide, name: e.target.value })}
+            onChange={e => setSlide({ ...slide, name: e.target.value })}
             required
           />
         </div>
         <div>
           <label>Imágenes</label>
-          <div className="flex flex-row overflow-scroll">
-            {localImages.map((img) => (
-              <img src={img} key={img} className="w-80 h-60" alt="" />
+          <div className='flex flex-row overflow-scroll'>
+            {localImages.map(img => (
+              <img src={img} key={img} className='w-80 h-60' alt='' />
             ))}
           </div>
           <UploadWidget
             onUpload={(error, result, widget) => {
-              const img = result?.info?.secure_url;
-              handleImageUpload(error, img, widget);
+              const img = result?.info?.secure_url
+              handleImageUpload(error, img, widget)
             }}
           >
             {({ open }) => {
               function handleOnClick(e) {
-                e.preventDefault();
-                open();
+                e.preventDefault()
+                open()
               }
               return (
-                <Button type="button" className="mt-2" onClick={handleOnClick}>
+                <Button type='button' className='mt-2' onClick={handleOnClick}>
                   Agregar Imagen
                 </Button>
-              );
+              )
             }}
           </UploadWidget>
         </div>
-        <Button type="submit">Crear Slide</Button>
+        <Button type='submit'>Crear Slide</Button>
       </form>
     </div>
-  );
+  )
 }

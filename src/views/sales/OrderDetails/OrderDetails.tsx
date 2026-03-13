@@ -1,105 +1,109 @@
-import { useState, useEffect } from "react";
-import classNames from "classnames";
-import Tag from "@/components/ui/Tag";
-import Loading from "@/components/shared/Loading";
-import Container from "@/components/shared/Container";
-import DoubleSidedImage from "@/components/shared/DoubleSidedImage";
-import OrderProducts from "./components/OrderProducts";
-import PaymentSummary from "./components/PaymentSummary";
-import ShippingInfo from "./components/ShippingInfo";
-import Activity from "./components/Activity";
-import CustomerInfo from "./components/CustomerInfo";
-import { HiOutlineCalendar } from "react-icons/hi";
-import { apiGetSalesOrderDetails } from "@/services/SalesService";
-import { useLocation } from "react-router-dom";
-import isEmpty from "lodash/isEmpty";
-import dayjs from "dayjs";
-import supabase from "@/services/Supabase/BaseClient";
-import { Button, Select } from "@/components/ui";
+import classNames from 'classnames'
+import dayjs from 'dayjs'
+import isEmpty from 'lodash/isEmpty'
+import { useState, useEffect } from 'react'
+import { HiOutlineCalendar } from 'react-icons/hi'
+import { useLocation } from 'react-router-dom'
+
+import handleEmail from '@/components/email'
+import Container from '@/components/shared/Container'
+import DoubleSidedImage from '@/components/shared/DoubleSidedImage'
+import Loading from '@/components/shared/Loading'
+import { Button, Select } from '@/components/ui'
+import Tag from '@/components/ui/Tag'
+import { apiGetSalesOrderDetails } from '@/services/SalesService'
+import supabase from '@/services/Supabase/BaseClient'
+
 import {
   deliveryStatusColor,
   orderStatusColor,
-} from "../SalesDashboard/components/LatestOrder";
-import Label from "@/components/ui/Label";
-import handleEmail from "@/components/email";
-import PersonalizationDetails from "./components/PersonalizationDetails";
-import SellerInfo from "./components/SellerInfo";
+} from '../SalesDashboard/components/LatestOrder'
+import Activity from './components/Activity'
+import OrderProducts from './components/OrderProducts'
+import PaymentSummary from './components/PaymentSummary'
+import ShippingInfo from './components/ShippingInfo'
+import CustomerInfo from './components/CustomerInfo'
+
+import Label from '@/components/ui/Label'
+
+import PersonalizationDetails from './components/PersonalizationDetails'
+import SellerInfo from './components/SellerInfo'
 
 type SalesOrderDetailsResponse = {
-  id?: string;
-  progressStatus?: number;
-  deliveryStatus?: number;
-  dateTime?: number;
+  id?: string
+  progressStatus?: number
+  deliveryStatus?: number
+  dateTime?: number
   paymentSummary?: {
-    subTotal: number;
-    tax: number;
-    personalization: number;
-    deliveryFees: number;
-    total: number;
-  };
+    subTotal: number
+    tax: number
+    personalization: number
+    deliveryFees: number
+    total: number
+  }
   shipping?: {
-    deliveryFees: number;
-    estimatedMin: number;
-    estimatedMax: number;
-    shippingLogo: string;
-    shippingVendor: string;
-  };
+    deliveryFees: number
+    estimatedMin: number
+    estimatedMax: number
+    shippingLogo: string
+    shippingVendor: string
+  }
   product?: {
-    id: string;
-    name: string;
-    productCode: string;
-    img: string;
-    price: number;
-    quantity: number;
-    total: number;
-    details: Record<string, string[]>;
-  }[];
+    id: string
+    name: string
+    productCode: string
+    img: string
+    price: number
+    quantity: number
+    total: number
+    details: Record<string, string[]>
+  }[]
   activity?: {
-    date: number;
+    date: number
     events: {
-      time: number;
-      action: string;
-      recipient?: string;
-    }[];
-  }[];
+      time: number
+      action: string
+      recipient?: string
+    }[]
+  }[]
   seller: {
-    name: string;
-    email: string;
-    amountToPay: string | number;
-  };
+    name: string
+    email: string
+    amountToPay: string | number
+  }
   personalization: {
-    description: string;
-    price: string;
-    quantity: string;
-    images: string[];
-  };
+    description: string
+    price: string
+    quantity: string
+    images: string[]
+  }
   customer?: {
-    name: string;
-    email: string;
-    phone: string;
-    img: string;
-    previousOrder: number;
+    name: string
+    email: string
+    phone: string
+    img: string
+    previousOrder: number
     shippingAddress: {
-      line1: string;
-      line2: string;
-      line3: string;
-      line4: string;
-    };
+      line1: string
+      line2: string
+      line3: string
+      line4: string
+    }
     billingAddress: {
-      line1: string;
-      line2: string;
-      line3: string;
-      line4: string;
-    };
-  };
-};
+      line1: string
+      line2: string
+      line3: string
+      line4: string
+    }
+  }
+}
 const initialState: SalesOrderDetailsResponse = {
-  id: "",
+  id: '',
   personalization: {
-    description: "",
+    description: '',
     images: [],
-    price: "0",
-    quantity: "0",
+    price: '0',
+    quantity: '0',
   },
   progressStatus: 0,
   deliveryStatus: 0,
@@ -115,64 +119,64 @@ const initialState: SalesOrderDetailsResponse = {
     deliveryFees: 0,
     estimatedMin: 0,
     estimatedMax: 0,
-    shippingLogo: "",
-    shippingVendor: "",
+    shippingLogo: '',
+    shippingVendor: '',
   },
   product: [],
   activity: [],
   seller: {
-    name: "",
-    email: "",
-    amountToPay: "",
+    name: '',
+    email: '',
+    amountToPay: '',
   },
   customer: {
-    name: "",
-    email: "",
-    phone: "",
-    img: "",
+    name: '',
+    email: '',
+    phone: '',
+    img: '',
     previousOrder: 0,
     shippingAddress: {
-      line1: "",
-      line2: "",
-      line3: "",
-      line4: "",
+      line1: '',
+      line2: '',
+      line3: '',
+      line4: '',
     },
     billingAddress: {
-      line1: "",
-      line2: "",
-      line3: "",
-      line4: "",
+      line1: '',
+      line2: '',
+      line3: '',
+      line4: '',
     },
   },
-};
+}
 
 type deliveryStatus = {
-  label: string;
-  class: string;
-};
+  label: string
+  class: string
+}
 
 const paymentStatus: Record<number, deliveryStatus> = {
   0: {
-    label: "Paid",
+    label: 'Paid',
     class:
-      "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100",
+      'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-100',
   },
   1: {
-    label: "Unpaid",
-    class: "text-red-500 bg-red-100 dark:text-red-100 dark:bg-red-500/20",
+    label: 'Unpaid',
+    class: 'text-red-500 bg-red-100 dark:text-red-100 dark:bg-red-500/20',
   },
   2: {
-    label: "Unpaid",
-    class: "text-red-500 bg-red-100 dark:text-red-100 dark:bg-red-500/20",
+    label: 'Unpaid',
+    class: 'text-red-500 bg-red-100 dark:text-red-100 dark:bg-red-500/20',
   },
-};
+}
 
 export const getOrderDetails = async (
   orderId: string
 ): Promise<SalesOrderDetailsResponse> => {
   // Fetch order details
   const { data: order, error: orderError } = await supabase
-    .from("orders")
+    .from('orders')
     .select(
       `
             id,
@@ -186,14 +190,14 @@ export const getOrderDetails = async (
             seller : seller_id (*)
         `
     )
-    .eq("id", orderId)
-    .single();
+    .eq('id', orderId)
+    .single()
 
-  if (orderError) throw orderError;
+  if (orderError) throw orderError
 
   // Fetch order items
   const { data: orderItems, error: itemsError } = await supabase
-    .from("order_items")
+    .from('order_items')
     .select(
       `
             quantity,
@@ -208,46 +212,46 @@ export const getOrderDetails = async (
             )
         `
     )
-    .eq("order_id", orderId);
-  const personalization = order.personalized_orders[0];
-  if (itemsError) throw itemsError;
+    .eq('order_id', orderId)
+  const personalization = order.personalized_orders[0]
+  if (itemsError) throw itemsError
 
-  let totalCommission = 0; // Variable para acumular comisiones
-  const clientLocation = order.clients?.locations;
-  console.log("LOCA", order.clients?.locations);
-  const productList = orderItems.map((item) => {
-    const productVariation = item.product_variations;
-    const product = productVariation.products;
-    const commission = product.commission || 0;
-    const commissionType = product.commission_type;
-    const price = parseFloat(item.price);
-    const quantity = item.quantity;
+  let totalCommission = 0 // Variable para acumular comisiones
+  const clientLocation = order.clients?.locations
+  console.log('LOCA', order.clients?.locations)
+  const productList = orderItems.map(item => {
+    const productVariation = item.product_variations
+    const product = productVariation.products
+    const commission = product.commission || 0
+    const commissionType = product.commission_type
+    const price = parseFloat(item.price)
+    const quantity = item.quantity
 
     // Calcular comisión por item
-    let itemCommission = 0;
-    if (commissionType === "percentage") {
-      itemCommission = price * (commission / 100) * quantity;
-    } else if (commissionType === "fixed") {
-      itemCommission = commission * quantity;
+    let itemCommission = 0
+    if (commissionType === 'percentage') {
+      itemCommission = price * (commission / 100) * quantity
+    } else if (commissionType === 'fixed') {
+      itemCommission = commission * quantity
     }
-    totalCommission += itemCommission;
+    totalCommission += itemCommission
 
     return {
       id: productVariation?.id.toString(),
       name: productVariation?.name,
-      productCode: "",
-      img: productVariation?.pictures[0] || "",
+      productCode: '',
+      img: productVariation?.pictures[0] || '',
       price: price,
       quantity: quantity,
       total: price * quantity,
       currency: item.product_variations?.currency.name,
-      attributesValues: item.product_variations?.attribute_values.map((av) => ({
+      attributesValues: item.product_variations?.attribute_values.map(av => ({
         name: av.type.name,
         value: av.value,
       })),
       details: {}, // Not available in the current schema
-    };
-  });
+    }
+  })
 
   // Map the data to the required format
   const orderDetails: SalesOrderDetailsResponse = {
@@ -271,8 +275,8 @@ export const getOrderDetails = async (
       deliveryFees: parseFloat(order.shipping_cost),
       estimatedMin: 0, // Not available in the current schema
       estimatedMax: 0, // Not available in the current schema
-      shippingLogo: "", // Not available in the current schema
-      shippingVendor: "", // Not available in the current schema
+      shippingLogo: '', // Not available in the current schema
+      shippingVendor: '', // Not available in the current schema
     },
     product: productList,
     activity: [], // Not available in the current schema
@@ -287,84 +291,84 @@ export const getOrderDetails = async (
           name: order.clients.name,
           email: order.clients.email,
           phone: order.clients.phone,
-          img: "",
+          img: '',
           previousOrder: 0, // Not available in the current schema
           shippingAddress: {
             line1: clientLocation
-              ? (clientLocation?.description +
-                " " +
-                clientLocation?.municipalities?.name)
-              : "",
+              ? clientLocation?.description +
+                ' ' +
+                clientLocation?.municipalities?.name
+              : '',
           },
         }
       : undefined,
-  };
+  }
 
-  return orderDetails;
-};
+  return orderDetails
+}
 
 const OrderDetails = () => {
-  const location = useLocation();
+  const location = useLocation()
 
-  const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<SalesOrderDetailsResponse>(initialState);
-  const [stateOfProduct, setStateOfProduct] = useState(0);
-  const [stateOfProduct2, setStateOfProduct2] = useState(0);
-  const [options, setOptions] = useState([]);
-  const [options2, setOptions2] = useState([]);
+  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState<SalesOrderDetailsResponse>(initialState)
+  const [stateOfProduct, setStateOfProduct] = useState(0)
+  const [stateOfProduct2, setStateOfProduct2] = useState(0)
+  const [options, setOptions] = useState([])
+  const [options2, setOptions2] = useState([])
 
-  useEffect(() => {}, []);
+  useEffect(() => {}, [])
   useEffect(() => {
-    fetchData();
-    const formattedOptions = Object.values(orderStatusColor).map((option) => ({
+    fetchData()
+    const formattedOptions = Object.values(orderStatusColor).map(option => ({
       value: option.value,
       label: option.label,
-    }));
+    }))
     const formattedOptions2 = Object.values(deliveryStatusColor).map(
-      (option) => ({
+      option => ({
         value: option.value,
         label: option.label,
       })
-    );
-    setOptions(formattedOptions);
-    setOptions2(formattedOptions2);
+    )
+    setOptions(formattedOptions)
+    setOptions2(formattedOptions2)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   const fetchData = async () => {
     const id = location.pathname.substring(
-      location.pathname.lastIndexOf("/") + 1
-    );
+      location.pathname.lastIndexOf('/') + 1
+    )
     if (id) {
-      setLoading(true);
-      const response = await getOrderDetails(id);
+      setLoading(true)
+      const response = await getOrderDetails(id)
       if (response) {
-        setLoading(false);
-        setData(response);
-        console.log(response.progressStatus, response.deliveryStatus);
-        setStateOfProduct(response.progressStatus);
-        setStateOfProduct2(response.deliveryStatus);
+        setLoading(false)
+        setData(response)
+        console.log(response.progressStatus, response.deliveryStatus)
+        setStateOfProduct(response.progressStatus)
+        setStateOfProduct2(response.deliveryStatus)
       }
     }
-  };
+  }
 
   const handleSelectChange = (option: any) => {
-    console.log(option?.value);
-    setStateOfProduct(option?.value);
+    console.log(option?.value)
+    setStateOfProduct(option?.value)
     // supabase.from("orders").update({ status: option?.value }).eq("id", data.id);
-  };
+  }
   const handleSelect2Change = (option: any) => {
-    console.log(option?.value);
-    setStateOfProduct2(option?.value);
-  };
+    console.log(option?.value)
+    setStateOfProduct2(option?.value)
+  }
 
   const changeState = () => {
     // Tienes que hacer las llamadas de email para los Correos
     if (stateOfProduct !== data.progressStatus) {
       if ([0, 1, 2, 3].includes(stateOfProduct)) {
-        handleEmail(stateOfProduct, data.customer.email);
+        handleEmail(stateOfProduct, data.customer.email)
       } else if (stateOfProduct === 4) {
-        const { name, email } = data.customer;
+        const { name, email } = data.customer
         handleEmail(
           stateOfProduct,
           email, // Usar email desestructurado
@@ -372,7 +376,7 @@ const OrderDetails = () => {
           name, // Enviar nombre en lugar de objeto completo
           data.seller.name,
           data.seller.amountToPay
-        );
+        )
       }
     }
 
@@ -385,31 +389,31 @@ const OrderDetails = () => {
         data.seller.name
       ).then(() =>
         supabase
-          .from("orders")
+          .from('orders')
           .update({
             status: stateOfProduct,
             delivery_state: stateOfProduct2,
           })
-          .eq("id", data.id)
-          .select("status, delivery_state")
+          .eq('id', data.id)
+          .select('status, delivery_state')
           .single()
-      );
+      )
     // Cambiar los estados en la base de datos - deliveryState - State
-  };
+  }
   return (
-    <Container className="h-full">
+    <Container className='h-full'>
       <Loading loading={false}>
         {!isEmpty(data) && (
           <>
-            <div className="mb-6">
-              <div className="flex items-center mb-2">
+            <div className='mb-6'>
+              <div className='flex items-center mb-2'>
                 <h3>
                   <span>Orden</span>
-                  <span className="ltr:ml-2 rtl:mr-2">#{data.id}</span>
+                  <span className='ltr:ml-2 rtl:mr-2'>#{data.id}</span>
                 </h3>
                 <Tag
                   className={classNames(
-                    "border-0 rounded-md ltr:ml-2 rtl:mr-2",
+                    'border-0 rounded-md ltr:ml-2 rtl:mr-2',
                     deliveryStatusColor[data.deliveryStatus || 0].class
                   )}
                 >
@@ -417,53 +421,53 @@ const OrderDetails = () => {
                 </Tag>
                 <Tag
                   className={classNames(
-                    "border-0 rounded-md ltr:ml-2 rtl:mr-2",
+                    'border-0 rounded-md ltr:ml-2 rtl:mr-2',
                     orderStatusColor[data.progressStatus || 0].class
                   )}
                 >
                   {orderStatusColor[data.progressStatus || 0].label}
                 </Tag>
               </div>
-              <span className="flex items-center">
-                <HiOutlineCalendar className="text-lg" />
-                <span className="ltr:ml-1 rtl:mr-1">
-                  {dayjs(data.dateTime || 0).format("ddd DD-MMM-YYYY, hh:mm A")}
+              <span className='flex items-center'>
+                <HiOutlineCalendar className='text-lg' />
+                <span className='ltr:ml-1 rtl:mr-1'>
+                  {dayjs(data.dateTime || 0).format('ddd DD-MMM-YYYY, hh:mm A')}
                 </span>
               </span>
             </div>
-            <div className="xl:flex gap-4">
-              <div className="w-full">
+            <div className='xl:flex gap-4'>
+              <div className='w-full'>
                 <OrderProducts data={data.product} />
-                <div className="xl:grid grid-cols-2 gap-4">
+                <div className='xl:grid grid-cols-2 gap-4'>
                   {/* <ShippingInfo data={data.shipping} /> */}
                   <PaymentSummary data={data.paymentSummary} />
                 </div>
                 {/* <Activity data={data.activity} /> */}
               </div>
-              <div className="xl:max-w-[360px] w-full">
+              <div className='xl:max-w-[360px] w-full'>
                 <CustomerInfo data={data.customer} />
               </div>
-              <div className="xl:max-w-[360px] w-full">
+              <div className='xl:max-w-[360px] w-full'>
                 <SellerInfo seller={data.seller} />
               </div>
-              <div className="xl:max-w-[360px] w-full">
+              <div className='xl:max-w-[360px] w-full'>
                 <PersonalizationDetails data={data.personalization} />
               </div>
             </div>
-            <div className="gap-4">
-              <div className="mt-5">
+            <div className='gap-4'>
+              <div className='mt-5'>
                 <Label>Estado del Pedido</Label>
                 <Select
                   options={options}
-                  value={options.find((o) => o.value == stateOfProduct)}
+                  value={options.find(o => o.value == stateOfProduct)}
                   onChange={handleSelectChange}
                 />
               </div>
-              <div className="mt-5">
+              <div className='mt-5'>
                 <Label>Estado de la Mensajería</Label>
                 <Select
                   options={options2}
-                  value={options2.find((o2) => o2.value == stateOfProduct2)}
+                  value={options2.find(o2 => o2.value == stateOfProduct2)}
                   onChange={handleSelect2Change}
                 />
               </div>
@@ -475,8 +479,8 @@ const OrderDetails = () => {
                       stateOfProduct2 != data.deliveryStatus
                     )
                   }
-                  className="mt-5"
-                  variant="solid"
+                  className='mt-5'
+                  variant='solid'
                   onClick={changeState}
                 >
                   Guardar
@@ -487,17 +491,17 @@ const OrderDetails = () => {
         )}
       </Loading>
       {!loading && isEmpty(data) && (
-        <div className="h-full flex flex-col items-center justify-center">
+        <div className='h-full flex flex-col items-center justify-center'>
           <DoubleSidedImage
-            src="/img/others/img-2.png"
-            darkModeSrc="/img/others/img-2-dark.png"
-            alt="No order found!"
+            src='/img/others/img-2.png'
+            darkModeSrc='/img/others/img-2-dark.png'
+            alt='No order found!'
           />
-          <h3 className="mt-8">Ninguna Orden Encontrada</h3>
+          <h3 className='mt-8'>Ninguna Orden Encontrada</h3>
         </div>
       )}
     </Container>
-  );
-};
+  )
+}
 
-export default OrderDetails;
+export default OrderDetails

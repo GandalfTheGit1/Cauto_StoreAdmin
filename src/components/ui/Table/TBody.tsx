@@ -1,26 +1,21 @@
-import { forwardRef } from 'react'
 import classNames from 'classnames'
+import { forwardRef } from 'react'
 import type { ComponentPropsWithRef, ElementType } from 'react'
 
 export interface TBodyProps extends ComponentPropsWithRef<'tbody'> {
-    asElement?: ElementType
+  asElement?: ElementType
 }
 
 const TBody = forwardRef<HTMLElement, TBodyProps>((props, ref) => {
-    const {
-        asElement: Component = 'tbody',
-        children,
-        className,
-        ...rest
-    } = props
+  const { asElement: Component = 'tbody', children, className, ...rest } = props
 
-    const tBodyClass = classNames(Component !== 'tbody' && 'tbody', className)
+  const tBodyClass = classNames(Component !== 'tbody' && 'tbody', className)
 
-    return (
-        <Component className={tBodyClass} {...rest} ref={ref}>
-            {children}
-        </Component>
-    )
+  return (
+    <Component className={tBodyClass} {...rest} ref={ref}>
+      {children}
+    </Component>
+  )
 })
 
 TBody.displayName = 'TBody'

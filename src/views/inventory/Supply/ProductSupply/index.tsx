@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -8,16 +7,18 @@ import {
   flexRender,
   ColumnDef,
 } from '@tanstack/react-table'
+import React, { useState, useEffect } from 'react'
+
+import { Product } from '@/@types/products'
+import { Supply } from '@/@types/supply'
+import { Table } from '@/components/ui'
 import {
   getProductsByShop,
   getSuppliesByShop,
   getProductSuppliesByShop,
   createProductSupply,
-  deleteProductSupply
+  deleteProductSupply,
 } from '@/services/Supabase/AttributeService'
-import { Product } from '@/@types/products'
-import { Supply } from '@/@types/supply'
-import { Table } from '@/components/ui'
 
 const ProductSupplyManager: React.FC<{ shopId: number }> = ({ shopId }) => {
   const [products, setProducts] = useState<Product[]>([])
@@ -30,12 +31,12 @@ const ProductSupplyManager: React.FC<{ shopId: number }> = ({ shopId }) => {
       const productsData = await getProductsByShop(shopId)
       const suppliesData = await getSuppliesByShop(shopId)
       const productSuppliesData = await getProductSuppliesByShop(shopId)
-      
+
       setProducts(productsData)
       setSupplies(suppliesData)
       setProductSupplies(productSuppliesData)
     }
-    
+
     fetchData()
   }, [shopId])
 
@@ -47,12 +48,15 @@ const ProductSupplyManager: React.FC<{ shopId: number }> = ({ shopId }) => {
       },
       {
         header: 'Associated',
-        accessorFn: (row) => productSupplies.some(ps => ps.product_id === selectedProduct && ps.supply_id === row.id),
+        accessorFn: row =>
+          productSupplies.some(
+            ps => ps.product_id === selectedProduct && ps.supply_id === row.id
+          ),
         cell: ({ getValue }: CellContext<Supply, boolean>) => (
-          <input 
-            type="checkbox" 
-            checked={getValue()} 
-            onChange={(e) => handleCheckboxChange(row.id, e.target.checked)} 
+          <input
+            type='checkbox'
+            checked={getValue()}
+            onChange={e => handleCheckboxChange(row.id, e.target.checked)}
           />
         ),
       },
@@ -73,7 +77,7 @@ const ProductSupplyManager: React.FC<{ shopId: number }> = ({ shopId }) => {
   const handleProductChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedProduct(Number(event.target.value))
   }
-  
+
   const handleCheckboxChange = async (supplyId: number, isChecked: boolean) => {
     if (selectedProduct === null) return
 
@@ -90,9 +94,11 @@ const ProductSupplyManager: React.FC<{ shopId: number }> = ({ shopId }) => {
   return (
     <div>
       <select onChange={handleProductChange}>
-        <option value="">Select a product</option>
+        <option value=''>Select a product</option>
         {products.map(product => (
-          <option key={product.id} value={product.id}>{product.name}</option>
+          <option key={product.id} value={product.id}>
+            {product.name}
+          </option>
         ))}
       </select>
 
@@ -101,7 +107,12 @@ const ProductSupplyManager: React.FC<{ shopId: number }> = ({ shopId }) => {
           {table.getHeaderGroups().map(headerGroup => (
             <Tr key={headerGroup.id}>
               {headerGroup.headers.map(header => (
-                <Th key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</Th>
+                <Th key={header.id}>
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+                </Th>
               ))}
             </Tr>
           ))}
@@ -110,7 +121,9 @@ const ProductSupplyManager: React.FC<{ shopId: number }> = ({ shopId }) => {
           {table.getRowModel().rows.map(row => (
             <Tr key={row.id}>
               {row.getVisibleCells().map(cell => (
-                <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
+                <Td key={cell.id}>
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </Td>
               ))}
             </Tr>
           ))}

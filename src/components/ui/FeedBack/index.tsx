@@ -1,3 +1,3 @@
-import HandleFeedback from "./HandleFeedback";
+import HandleFeedback from './HandleFeedback'
 
 export default HandleFeedback

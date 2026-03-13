@@ -1,3 +1,3 @@
-import TableProfit from "./Components/Table"; 
+import TableProfit from './Components/Table'
 
-export default TableProfit;
+export default TableProfit

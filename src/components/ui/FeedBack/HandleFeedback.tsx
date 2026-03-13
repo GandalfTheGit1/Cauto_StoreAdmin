@@ -1,16 +1,17 @@
-import { useState } from "react";
-import toast from "@/components/ui/toast";
-import Notification from "@/components/ui/Notification";
+import { useState } from 'react'
+
+import Notification from '@/components/ui/Notification'
+import toast from '@/components/ui/toast'
 
 // Hook personalizado para manejar notificaciones
 const HandleFeedback = () => {
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
 
   // Función para mostrar la notificación
   const showNotification = (
-    type: "success" | "warning" | "danger" | "info",
+    type: 'success' | 'warning' | 'danger' | 'info',
     message: string
   ) => {
     //const isPersistent = type !== "info" || type !== "success"; // Solo loading será temporal
@@ -25,33 +26,33 @@ const HandleFeedback = () => {
       >
         {message}
       </Notification>
-    );
-  };
+    )
+  }
 
   // Manejar el estado de loading
   const handleLoading = (isLoading: boolean) => {
-    setLoading(isLoading);
+    setLoading(isLoading)
     if (isLoading) {
-      showNotification("info", "Cargando, por favor espera...");
+      showNotification('info', 'Cargando, por favor espera...')
     }
-  };
+  }
 
   // Manejar el estado de loading
   const handleLoadingState = (isLoading: boolean) => {
-    setLoading(isLoading);
-  };
+    setLoading(isLoading)
+  }
 
   // Manejar los errores
   const handleError = (errorMessage: string) => {
-    setError(errorMessage);
-    showNotification("danger", `Error: ${errorMessage}`);
-  };
+    setError(errorMessage)
+    showNotification('danger', `Error: ${errorMessage}`)
+  }
 
   // Manejar el éxito
   const handleSuccess = (successMessage: string) => {
-    setSuccess(successMessage);
-    showNotification("success", successMessage);
-  };
+    setSuccess(successMessage)
+    showNotification('success', successMessage)
+  }
 
   return {
     loading,
@@ -61,7 +62,7 @@ const HandleFeedback = () => {
     handleError,
     handleSuccess,
     handleLoadingState,
-  };
-};
+  }
+}
 
-export default HandleFeedback;
+export default HandleFeedback

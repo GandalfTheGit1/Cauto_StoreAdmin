@@ -1,41 +1,42 @@
-import { useEffect } from "react";
-import Logo from "@/components/template/Logo";
-import Menu from "@/components/ui/Menu";
-import ScrollBar from "@/components/ui/ScrollBar";
+import isEmpty from 'lodash/isEmpty'
+import { useEffect } from 'react'
+import { Link } from 'react-router-dom'
+
+import type { CommonProps } from '@/@types/common'
+import type { NavigationTree } from '@/@types/navigation'
+import type { Direction, NavMode, Mode } from '@/@types/theme'
+import AuthorityCheck from '@/components/shared/AuthorityCheck'
+import Logo from '@/components/template/Logo'
+import Menu from '@/components/ui/Menu'
+import ScrollBar from '@/components/ui/ScrollBar'
+import navigationIcon from '@/configs/navigation-icon.config'
+import navigationConfig from '@/configs/navigation.config'
+import { NAV_ITEM_TYPE_ITEM } from '@/constants/navigation.constant'
 import {
   NAV_MODE_DARK,
   NAV_MODE_THEMED,
   NAV_MODE_TRANSPARENT,
   SIDE_NAV_CONTENT_GUTTER,
-} from "@/constants/theme.constant";
-import { NAV_ITEM_TYPE_ITEM } from "@/constants/navigation.constant";
-import AuthorityCheck from "@/components/shared/AuthorityCheck";
-import navigationConfig from "@/configs/navigation.config";
-import navigationIcon from "@/configs/navigation-icon.config";
-import useMenuActive from "@/utils/hooks/useMenuActive";
-import isEmpty from "lodash/isEmpty";
-import { Link } from "react-router-dom";
-import type { NavigationTree } from "@/@types/navigation";
-import type { Direction, NavMode, Mode } from "@/@types/theme";
-import type { CommonProps } from "@/@types/common";
+} from '@/constants/theme.constant'
+import useMenuActive from '@/utils/hooks/useMenuActive'
 
 export type SelectedMenuItem = {
-  key?: string;
-  title?: string;
-  menu?: NavigationTree[];
-  translateKey?: string;
-};
+  key?: string
+  title?: string
+  menu?: NavigationTree[]
+  translateKey?: string
+}
 
 interface StackedSideNavMiniProps extends CommonProps {
-  className?: string;
-  navMode: NavMode;
-  onChange: (item: SelectedMenuItem) => void;
-  routeKey: string;
-  activeKeys: string[];
-  onSetActiveKey: (activeKey: string[]) => void;
-  userAuthority: string[];
-  mode: Mode;
-  direction: Direction;
+  className?: string
+  navMode: NavMode
+  onChange: (item: SelectedMenuItem) => void
+  routeKey: string
+  activeKeys: string[]
+  onSetActiveKey: (activeKey: string[]) => void
+  userAuthority: string[]
+  mode: Mode
+  direction: Direction
 }
 
 const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
@@ -49,21 +50,21 @@ const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
     mode,
     direction,
     ...rest
-  } = props;
+  } = props
 
-  const { includedRouteTree } = useMenuActive(navigationConfig, routeKey);
+  const { includedRouteTree } = useMenuActive(navigationConfig, routeKey)
 
   const logoMode = () => {
     if (navMode === NAV_MODE_THEMED) {
-      return NAV_MODE_DARK;
+      return NAV_MODE_DARK
     }
 
     if (navMode === NAV_MODE_TRANSPARENT) {
-      return mode;
+      return mode
     }
 
-    return navMode;
-  };
+    return navMode
+  }
 
   const handleMenuItemSelect = ({
     key,
@@ -71,14 +72,14 @@ const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
     menu,
     translateKey,
   }: SelectedMenuItem) => {
-    onChange({ title, menu, translateKey });
-    onSetActiveKey([key as string]);
-  };
+    onChange({ title, menu, translateKey })
+    onSetActiveKey([key as string])
+  }
 
   const handleLinkMenuItemSelect = ({ key }: SelectedMenuItem) => {
-    onChange({});
-    onSetActiveKey([key as string]);
-  };
+    onChange({})
+    onSetActiveKey([key as string])
+  }
 
   useEffect(() => {
     if (
@@ -90,25 +91,25 @@ const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
         title: includedRouteTree.title,
         menu: includedRouteTree.subMenu,
         translateKey: includedRouteTree.translateKey,
-      });
+      })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [includedRouteTree.key]);
+  }, [includedRouteTree.key])
 
   return (
     <div {...rest}>
       <Logo
         mode={logoMode()}
-        type="streamline"
+        type='streamline'
         className={SIDE_NAV_CONTENT_GUTTER}
       />
       <ScrollBar autoHide direction={direction}>
         <Menu
-          className="px-4 pb-4"
+          className='px-4 pb-4'
           variant={navMode}
           defaultActiveKeys={activeKeys || [includedRouteTree.key]}
         >
-          {navigationConfig.map((nav) => (
+          {navigationConfig.map(nav => (
             <AuthorityCheck
               key={nav.key}
               authority={nav.authority}
@@ -117,7 +118,7 @@ const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
               {nav.subMenu && nav.subMenu.length > 0 ? (
                 <Menu.MenuItem
                   eventKey={nav.key}
-                  className="mb-2"
+                  className='mb-2'
                   onSelect={() =>
                     handleMenuItemSelect({
                       key: nav.key,
@@ -127,20 +128,20 @@ const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
                     })
                   }
                 >
-                  <div className="text-2xl">{navigationIcon[nav.icon]}</div>
+                  <div className='text-2xl'>{navigationIcon[nav.icon]}</div>
                 </Menu.MenuItem>
               ) : (
                 <Link
                   to={nav.path}
-                  className="flex items-center h-full w-full"
+                  className='flex items-center h-full w-full'
                   onClick={() =>
                     handleLinkMenuItemSelect({
                       key: nav.key,
                     })
                   }
                 >
-                  <Menu.MenuItem eventKey={nav.key} className="mb-2">
-                    <div className="text-2xl">{navigationIcon[nav.icon]}</div>
+                  <Menu.MenuItem eventKey={nav.key} className='mb-2'>
+                    <div className='text-2xl'>{navigationIcon[nav.icon]}</div>
                   </Menu.MenuItem>
                 </Link>
               )}
@@ -149,7 +150,7 @@ const StackedSideNavMini = (props: StackedSideNavMiniProps) => {
         </Menu>
       </ScrollBar>
     </div>
-  );
-};
+  )
+}
 
-export default StackedSideNavMini;
+export default StackedSideNavMini

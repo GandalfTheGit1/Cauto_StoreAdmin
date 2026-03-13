@@ -1,53 +1,54 @@
-import { Button } from "@/components/ui";
-import HandleFeedback from "@/components/ui/FeedBack";
-import supabase from "@/services/Supabase/BaseClient";
-import { setProductsSelected, useAppDispatch, useAppSelector } from "@/store";
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react'
+
+import { Button } from '@/components/ui'
+import HandleFeedback from '@/components/ui/FeedBack'
+import supabase from '@/services/Supabase/BaseClient'
+import { setProductsSelected, useAppDispatch, useAppSelector } from '@/store'
 
 type ProductVariation = {
-  id: number;
-  name: string;
-  offer_price: number;
-  required_quantity: number;
-};
+  id: number
+  name: string
+  offer_price: number
+  required_quantity: number
+}
 
 export type Offer = {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  variations: ProductVariation[];
-};
+  id: number
+  name: string
+  price: number
+  image: string
+  variations: ProductVariation[]
+}
 
 // Datos de prueba
 const mockOffers: Offer[] = [
   {
     id: 1,
-    name: "Oferta de Verano",
+    name: 'Oferta de Verano',
     price: 99.99,
-    image: "/placeholder.svg?height=300&width=300",
+    image: '/placeholder.svg?height=300&width=300',
     variations: [
       {
         id: 1,
-        name: "Camiseta Blanca S",
+        name: 'Camiseta Blanca S',
         offer_price: 15.99,
         required_quantity: 2,
       },
       {
         id: 2,
-        name: "Camiseta Azul M",
+        name: 'Camiseta Azul M',
         offer_price: 15.99,
         required_quantity: 2,
       },
       {
         id: 3,
-        name: "Shorts Rojos 32",
+        name: 'Shorts Rojos 32',
         offer_price: 24.99,
         required_quantity: 1,
       },
       {
         id: 4,
-        name: "Shorts Verdes 34",
+        name: 'Shorts Verdes 34',
         offer_price: 24.99,
         required_quantity: 1,
       },
@@ -55,31 +56,31 @@ const mockOffers: Offer[] = [
   },
   {
     id: 2,
-    name: "Oferta de Invierno",
+    name: 'Oferta de Invierno',
     price: 149.99,
-    image: "/placeholder.svg?height=300&width=300",
+    image: '/placeholder.svg?height=300&width=300',
     variations: [
       {
         id: 5,
-        name: "Abrigo Negro M",
+        name: 'Abrigo Negro M',
         offer_price: 79.99,
         required_quantity: 1,
       },
       {
         id: 6,
-        name: "Abrigo Gris L",
+        name: 'Abrigo Gris L',
         offer_price: 79.99,
         required_quantity: 1,
       },
-      { id: 7, name: "Bufanda Roja", offer_price: 19.99, required_quantity: 2 },
+      { id: 7, name: 'Bufanda Roja', offer_price: 19.99, required_quantity: 2 },
     ],
   },
-];
+]
 
 async function fetchOffers(shopId) {
   // Realizamos una consulta para obtener las ofertas con sus productos y variaciones
   const { data, error } = await supabase
-    .from("offers")
+    .from('offers')
     .select(
       `
         id,
@@ -102,111 +103,109 @@ async function fetchOffers(shopId) {
         )
       `
     )
-    .in("shop_id", shopId);
+    .in('shop_id', shopId)
 
   if (error) {
-    console.error("Error fetching offers:", error);
-    return [];
+    console.error('Error fetching offers:', error)
+    return []
   }
 
   // Transformamos los datos para que coincidan con la estructura esperada por nuestro componente React
 
-  return data;
+  return data
 }
 
 // Uso de la función
 
 export default function OfferDisplay() {
-  const [offers, setOffers] = useState<Offer[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([])
   const { shopId, authority, sellersShops } = useAppSelector(
-    (state) => state.auth.user
-  );
+    state => state.auth.user
+  )
   const { productsSelected, offersSelected } = useAppSelector(
-    (state) => state.products
-  );
-  const dispatch = useAppDispatch();
-  const { handleSuccess } = HandleFeedback();
+    state => state.products
+  )
+  const dispatch = useAppDispatch()
+  const { handleSuccess } = HandleFeedback()
 
   useEffect(() => {
-    console.log("SELELER", sellersShops);
+    console.log('SELELER', sellersShops)
     // Simula la carga de datos
     fetchOffers(sellersShops)
-      .then((offers) => {
+      .then(offers => {
         // Aquí puedes actualizar el estado de tu componente React con estos datos
-        setOffers(offers);
+        setOffers(offers)
       })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }, [authority]);
+      .catch(error => {
+        console.error('Error:', error)
+      })
+  }, [authority])
 
   // Function to add or update a product variation
-  const addOrUpdateItem = (item) => {
+  const addOrUpdateItem = item => {
     // Find if the item already exists in productsSelected
-    const existingItem = offersSelected.find((i) => i.id === item.id);
+    const existingItem = offersSelected.find(i => i.id === item.id)
     if (existingItem) {
       // Dispatch action to update redux state
 
       dispatch(
         setProductsSelected({
           productsSelected: productsSelected,
-          offersSelected: offersSelected.filter(
-            (item2) => item.id !== item2.id
-          ),
+          offersSelected: offersSelected.filter(item2 => item.id !== item2.id),
         })
-      );
-      handleSuccess("Éxito sacar el Producto");
+      )
+      handleSuccess('Éxito sacar el Producto')
     } else {
       dispatch(
         setProductsSelected({
           productsSelected: productsSelected,
           offersSelected: [...offersSelected, item],
         })
-      );
-      handleSuccess("Éxito introducir el Producto");
+      )
+      handleSuccess('Éxito introducir el Producto')
     }
-  };
+  }
 
   if (offers.length === 0) {
-    return <div>Cargando ofertas...</div>;
+    return <div>Cargando ofertas...</div>
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {offers.map((offer) => {
-        const psfinded = offersSelected.find((PS) => PS.id === offer.id);
+    <div className='container mx-auto px-4 py-8'>
+      {offers.map(offer => {
+        const psfinded = offersSelected.find(PS => PS.id === offer.id)
         return (
-          <section key={offer.id} className="mb-12 border-b pb-8">
-            <div className="flex items-center mb-6">
+          <section key={offer.id} className='mb-12 border-b pb-8'>
+            <div className='flex items-center mb-6'>
               <img
                 src={offer.image}
                 alt={offer.name}
                 width={100}
                 height={100}
-                className="rounded-lg object-cover mr-4"
+                className='rounded-lg object-cover mr-4'
               />
               <div>
-                <h2 className="text-2xl font-bold">{offer.name}</h2>
-                <p className="text-xl font-semibold text-blue-600">
+                <h2 className='text-2xl font-bold'>{offer.name}</h2>
+                <p className='text-xl font-semibold text-blue-600'>
                   ${offer.price}
                 </p>
               </div>
             </div>
 
-            <div className="overflow-x-auto">
-              <div className="flex space-x-4 pb-4">
+            <div className='overflow-x-auto'>
+              <div className='flex space-x-4 pb-4'>
                 {offer.variations.map((variation, key) => (
                   <div
                     key={key}
-                    className="flex-shrink-0 w-48 border rounded-lg p-4 shadow-md"
+                    className='flex-shrink-0 w-48 border rounded-lg p-4 shadow-md'
                   >
-                    <h3 className="text-lg font-medium mb-2">
+                    <h3 className='text-lg font-medium mb-2'>
                       {variation.name}
                     </h3>
-                    <p className="text-sm mb-1">
+                    <p className='text-sm mb-1'>
                       Precio: ${variation.offer_price.toFixed(2)}
                     </p>
-                    <p className="text-sm font-semibold">
+                    <p className='text-sm font-semibold'>
                       Cantidad requerida: {variation.required_quantity}
                     </p>
                   </div>
@@ -216,20 +215,20 @@ export default function OfferDisplay() {
 
             <div>
               <Button
-                style={{ width: "200px" }}
-                type="button"
-                variant={psfinded ? "twoTone" : "solid"}
-                size="md"
+                style={{ width: '200px' }}
+                type='button'
+                variant={psfinded ? 'twoTone' : 'solid'}
+                size='md'
                 onClick={() => {
-                  addOrUpdateItem(offer);
+                  addOrUpdateItem(offer)
                 }}
               >
                 {psfinded ? <>Sacar Oferta </> : <>Agregar Oferta </>}
               </Button>
             </div>
           </section>
-        );
+        )
       })}
     </div>
-  );
+  )
 }

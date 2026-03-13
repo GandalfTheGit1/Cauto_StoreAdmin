@@ -1,27 +1,28 @@
+import { Formik, Form, Field } from 'formik'
 import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import { Formik, Form, Field } from 'formik'
 import * as Yup from 'yup'
-import { Input } from "@/components/ui/Input"
-import { Button } from "@/components/ui/Button"
-import { Card } from "@/components/ui/Card"
-import { Alert } from "@/components/ui/Alert"
-import { Checkbox } from "@/components/ui/Checkbox"
+
+import { Alert } from '@/components/ui/Alert'
+import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/Card'
+import { Checkbox } from '@/components/ui/Checkbox'
+import { Input } from '@/components/ui/Input'
 
 interface Category {
-  id: number;
-  name: string;
-  description: string | null;
-  created_at: string;
-  parent_id: number | null;
-  subcategories?: Category[];
+  id: number
+  name: string
+  description: string | null
+  created_at: string
+  parent_id: number | null
+  subcategories?: Category[]
 }
 
 interface FormValues {
-  name: string;
-  description: string;
-  parent_id: number | null;
-  subcategories: number[];
+  name: string
+  description: string
+  parent_id: number | null
+  subcategories: number[]
 }
 
 const initialValues: FormValues = {
@@ -41,12 +42,30 @@ const validationSchema = Yup.object().shape({
 // Servicio mock para obtener categorías (reemplazar con llamada real a Supabase)
 const fetchCategories = async (shopId: number): Promise<Category[]> => {
   // Simulamos una llamada a la API
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, 500))
   return [
-    { id: 1, name: 'Electrónica', description: 'Productos electrónicos', created_at: new Date().toISOString(), parent_id: null },
-    { id: 2, name: 'Ropa', description: 'Artículos de vestir', created_at: new Date().toISOString(), parent_id: null },
-    { id: 3, name: 'Smartphones', description: 'Teléfonos inteligentes', created_at: new Date().toISOString(), parent_id: 1 },
-  ];
+    {
+      id: 1,
+      name: 'Electrónica',
+      description: 'Productos electrónicos',
+      created_at: new Date().toISOString(),
+      parent_id: null,
+    },
+    {
+      id: 2,
+      name: 'Ropa',
+      description: 'Artículos de vestir',
+      created_at: new Date().toISOString(),
+      parent_id: null,
+    },
+    {
+      id: 3,
+      name: 'Smartphones',
+      description: 'Teléfonos inteligentes',
+      created_at: new Date().toISOString(),
+      parent_id: 1,
+    },
+  ]
 }
 
 // Servicios de Supabase (comentados)
@@ -88,8 +107,9 @@ const updateCategory = async (id: number, category: Partial<Category>): Promise<
 */
 
 export default function CategoryForm() {
-  const { id, shopId } = useParams<{ id: string, shopId: string }>()
-  const [initialFormValues, setInitialFormValues] = useState<FormValues>(initialValues)
+  const { id, shopId } = useParams<{ id: string; shopId: string }>()
+  const [initialFormValues, setInitialFormValues] =
+    useState<FormValues>(initialValues)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
@@ -104,13 +124,17 @@ export default function CategoryForm() {
         if (id) {
           // Aquí iría la lógica para cargar los datos de la categoría existente
           // Por ahora, simularemos la carga con datos mock
-          const existingCategory = categoriesData.find(c => c.id === parseInt(id))
+          const existingCategory = categoriesData.find(
+            c => c.id === parseInt(id)
+          )
           if (existingCategory) {
             setInitialFormValues({
               name: existingCategory.name,
               description: existingCategory.description || '',
               parent_id: existingCategory.parent_id,
-              subcategories: categoriesData.filter(c => c.parent_id === existingCategory.id).map(c => c.id),
+              subcategories: categoriesData
+                .filter(c => c.parent_id === existingCategory.id)
+                .map(c => c.id),
             })
           }
         }
@@ -124,14 +148,17 @@ export default function CategoryForm() {
     loadData()
   }, [id, shopId])
 
-  const handleSubmit = async (values: FormValues, { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }) => {
+  const handleSubmit = async (
+    values: FormValues,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
     try {
       // Aquí iría la lógica para enviar los datos al servidor
       // Por ahora, simularemos el envío
       await new Promise(resolve => setTimeout(resolve, 1000))
       console.log(values)
       alert(id ? 'Categoría actualizada' : 'Categoría creada')
-      
+
       // Comentado: Código para usar con Supabase
       /*
       if (id) {
@@ -162,17 +189,23 @@ export default function CategoryForm() {
   }
 
   if (isLoading) {
-    return <div className="text-center py-8">Cargando...</div>
+    return <div className='text-center py-8'>Cargando...</div>
   }
 
   if (error) {
-    return <Alert variant="destructive"><AlertDescription>{error}</AlertDescription></Alert>
+    return (
+      <Alert variant='destructive'>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
+    )
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <div className="pt-6">
-        <h2 className="text-2xl font-bold mb-6">{id ? 'Editar Categoría' : 'Crear Categoría'}</h2>
+    <Card className='w-full max-w-2xl mx-auto'>
+      <div className='pt-6'>
+        <h2 className='text-2xl font-bold mb-6'>
+          {id ? 'Editar Categoría' : 'Crear Categoría'}
+        </h2>
         <Formik
           initialValues={initialFormValues}
           validationSchema={validationSchema}
@@ -180,70 +213,101 @@ export default function CategoryForm() {
           enableReinitialize
         >
           {({ values, errors, touched, isSubmitting, setFieldValue }) => (
-            <Form className="space-y-6">
+            <Form className='space-y-6'>
               <div>
-                <label htmlFor="name">Nombre</label>
-                <Field name="name" as={Input} className="mt-1" />
-                {errors.name && touched.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+                <label htmlFor='name'>Nombre</label>
+                <Field name='name' as={Input} className='mt-1' />
+                {errors.name && touched.name && (
+                  <p className='text-red-500 text-sm mt-1'>{errors.name}</p>
+                )}
               </div>
 
               <div>
-                <label htmlFor="description">Descripción</label>
-                <Field name="description" as={Textarea} className="mt-1" />
-                {errors.description && touched.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+                <label htmlFor='description'>Descripción</label>
+                <Field name='description' as={Textarea} className='mt-1' />
+                {errors.description && touched.description && (
+                  <p className='text-red-500 text-sm mt-1'>
+                    {errors.description}
+                  </p>
+                )}
               </div>
 
               <div>
                 <label>Categoría Padre</label>
-                <div className="space-y-2 mt-2">
-                  <div className="flex items-center space-x-2">
+                <div className='space-y-2 mt-2'>
+                  <div className='flex items-center space-x-2'>
                     <Checkbox
-                      id="no-parent"
+                      id='no-parent'
                       checked={values.parent_id === null}
-                      onCheckedChange={(checked) => {
+                      onCheckedChange={checked => {
                         setFieldValue('parent_id', checked ? null : '')
                       }}
                     />
-                    <label htmlFor="no-parent">Sin categoría padre</label>
+                    <label htmlFor='no-parent'>Sin categoría padre</label>
                   </div>
-                  {categories.filter(c => c.id !== parseInt(id)).map(category => (
-                    <div key={category.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`parent-${category.id}`}
-                        checked={values.parent_id === category.id}
-                        onCheckedChange={(checked) => {
-                          setFieldValue('parent_id', checked ? category.id : null)
-                        }}
-                      />
-                      <label htmlFor={`parent-${category.id}`}>{category.name}</label>
-                    </div>
-                  ))}
+                  {categories
+                    .filter(c => c.id !== parseInt(id))
+                    .map(category => (
+                      <div
+                        key={category.id}
+                        className='flex items-center space-x-2'
+                      >
+                        <Checkbox
+                          id={`parent-${category.id}`}
+                          checked={values.parent_id === category.id}
+                          onCheckedChange={checked => {
+                            setFieldValue(
+                              'parent_id',
+                              checked ? category.id : null
+                            )
+                          }}
+                        />
+                        <label htmlFor={`parent-${category.id}`}>
+                          {category.name}
+                        </label>
+                      </div>
+                    ))}
                 </div>
               </div>
 
               <div>
                 <label>Subcategorías</label>
-                <div className="space-y-2 mt-2">
-                  {categories.filter(c => c.id !== parseInt(id) && c.id !== values.parent_id).map(category => (
-                    <div key={category.id} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={`subcategory-${category.id}`}
-                        checked={values.subcategories.includes(category.id)}
-                        onCheckedChange={(checked) => {
-                          const newSubcategories = checked
-                            ? [...values.subcategories, category.id]
-                            : values.subcategories.filter(id => id !== category.id)
-                          setFieldValue('subcategories', newSubcategories)
-                        }}
-                      />
-                      <label htmlFor={`subcategory-${category.id}`}>{category.name}</label>
-                    </div>
-                  ))}
+                <div className='space-y-2 mt-2'>
+                  {categories
+                    .filter(
+                      c => c.id !== parseInt(id) && c.id !== values.parent_id
+                    )
+                    .map(category => (
+                      <div
+                        key={category.id}
+                        className='flex items-center space-x-2'
+                      >
+                        <Checkbox
+                          id={`subcategory-${category.id}`}
+                          checked={values.subcategories.includes(category.id)}
+                          onCheckedChange={checked => {
+                            const newSubcategories = checked
+                              ? [...values.subcategories, category.id]
+                              : values.subcategories.filter(
+                                  id => id !== category.id
+                                )
+                            setFieldValue('subcategories', newSubcategories)
+                          }}
+                        />
+                        <label htmlFor={`subcategory-${category.id}`}>
+                          {category.name}
+                        </label>
+                      </div>
+                    ))}
                 </div>
               </div>
 
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Enviando...' : id ? 'Actualizar Categoría' : 'Crear Categoría'}
+              <Button type='submit' disabled={isSubmitting}>
+                {isSubmitting
+                  ? 'Enviando...'
+                  : id
+                  ? 'Actualizar Categoría'
+                  : 'Crear Categoría'}
               </Button>
             </Form>
           )}

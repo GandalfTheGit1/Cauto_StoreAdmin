@@ -1,76 +1,77 @@
-import React, { Fragment, useMemo } from "react";
-import Table from "@/components/ui/Table";
 import {
   useReactTable,
   getCoreRowModel,
   flexRender,
-} from "@tanstack/react-table";
-import Label from "@/components/ui/Label";
-import { Tag } from "@/components/ui";
+} from '@tanstack/react-table'
+import React, { Fragment, useMemo } from 'react'
 
-const { Tr, Th, Td, THead, TBody } = Table;
+import { Tag } from '@/components/ui'
+import Label from '@/components/ui/Label'
+import Table from '@/components/ui/Table'
+
+const { Tr, Th, Td, THead, TBody } = Table
 
 function SubTable({ data }) {
   const columns = useMemo(
     () => [
       {
-        header: "ID",
-        accessorKey: "id",
+        header: 'ID',
+        accessorKey: 'id',
       },
       // {
       //   header: 'Nombre',
       //   accessorKey: 'name',
       // },
       {
-        header: "Precio",
-        accessorKey: "price",
+        header: 'Precio',
+        accessorKey: 'price',
         cell: ({ row }) => {
-          console.log(row);
+          console.log(row)
           return (
             <div>
               {row.original.price} {row.original.currency.name}
             </div>
-          );
+          )
         },
       },
       {
-        header: "Stock",
-        accessorKey: "stock",
+        header: 'Stock',
+        accessorKey: 'stock',
         cell: ({ row }) => {
-          console.log(row);
-          return <div>{row.original.stock}</div>;
+          console.log(row)
+          return <div>{row.original.stock}</div>
         },
       },
       {
-        header: "Atributos",
+        header: 'Atributos',
         cell: ({ row }) => {
-          console.log(row);
+          console.log(row)
           return (
             <div>
-              {row.original.attribute_values.map((av) => (
+              {row.original.attribute_values.map(av => (
                 <Tag>{av.value}</Tag>
               ))}
             </div>
-          );
+          )
         },
       },
     ],
     []
-  );
+  )
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-  });
+  })
 
   return (
     <Table>
       <THead>
         <Tr>
-          {table.getHeaderGroups().map((headerGroup) => (
+          {table.getHeaderGroups().map(headerGroup => (
             <Fragment key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
+              {headerGroup.headers.map(header => (
                 <Th key={header.id} colSpan={header.colSpan}>
                   {flexRender(
                     header.column.columnDef.header,
@@ -83,9 +84,9 @@ function SubTable({ data }) {
         </Tr>
       </THead>
       <TBody>
-        {table.getRowModel().rows.map((row) => (
+        {table.getRowModel().rows.map(row => (
           <Tr key={row.id}>
-            {row.getVisibleCells().map((cell) => (
+            {row.getVisibleCells().map(cell => (
               <Td key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </Td>
@@ -94,7 +95,7 @@ function SubTable({ data }) {
         ))}
       </TBody>
     </Table>
-  );
+  )
 }
 
-export default SubTable;
+export default SubTable

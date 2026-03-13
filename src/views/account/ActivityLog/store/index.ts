@@ -1,20 +1,21 @@
 import { combineReducers } from '@reduxjs/toolkit'
-import reducers, { SLICE_NAME, ActivityLogState } from './activityLogSlice'
 import { useSelector } from 'react-redux'
-
 import type { TypedUseSelectorHook } from 'react-redux'
+
 import type { RootState } from '@/store'
 
+import reducers, { SLICE_NAME, ActivityLogState } from './activityLogSlice'
+
 const reducer = combineReducers({
-    data: reducers,
+  data: reducers,
 })
 
 export const useAppSelector: TypedUseSelectorHook<
-    RootState & {
-        [SLICE_NAME]: {
-            data: ActivityLogState
-        }
+  RootState & {
+    [SLICE_NAME]: {
+      data: ActivityLogState
     }
+  }
 > = useSelector
 
 export * from './activityLogSlice'

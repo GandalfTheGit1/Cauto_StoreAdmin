@@ -7,13 +7,13 @@ type RichTextEditorProps = ReactQuillProps
 export type RichTextEditorRef = ReactQuill
 
 const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
-    (props, ref) => {
-        return (
-            <div className="rich-text-editor">
-                <ReactQuill ref={ref} {...props} />
-            </div>
-        )
-    }
+  (props, ref) => {
+    return (
+      <div className='rich-text-editor'>
+        <ReactQuill ref={ref} {...props} />
+      </div>
+    )
+  }
 )
 
 RichTextEditor.displayName = 'RichTextEditor'

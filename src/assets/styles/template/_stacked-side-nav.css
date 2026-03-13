@@ -3,7 +3,7 @@
 }
 
 .stacked-side-nav-content {
-  height: calc(100vh - theme("spacing.16"));
+  height: calc(100vh - theme('spacing.16'));
   @apply overflow-y-auto;
 }
 

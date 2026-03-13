@@ -1,0 +1,10 @@
+// Inventory module exports with lazy loading optimization
+export { default as InventoryManagement } from './InventoryManagement'
+export { default as InventoryAnalytics } from './InventoryAnalytics'
+export { default as Product } from './Product'
+export { default as Supply } from './Supply'
+export { default as Categories } from './Categories'
+export { default as Attributes } from './Attributes'
+export { default as AttributesNew } from './AttributesNew'
+export { default as Gallery } from './Gallery'
+export { default as Delievery } from './Delievery'

@@ -1,18 +1,19 @@
-import { Tag } from "@/components/ui";
-import { Button } from "@/components/ui/Button";
-import HandleFeedback from "@/components/ui/FeedBack";
-import Table from "@/components/ui/Table";
-import supabase from "@/services/Supabase/BaseClient";
 import {
   flexRender,
   getCoreRowModel,
   getExpandedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { Fragment, useMemo } from "react";
-import { HiOutlineChevronDown, HiOutlineChevronRight } from "react-icons/hi";
+} from '@tanstack/react-table'
+import { Fragment, useMemo } from 'react'
+import { HiOutlineChevronDown, HiOutlineChevronRight } from 'react-icons/hi'
 
-const { Tr, Th, Td, THead, TBody } = Table;
+import { Tag } from '@/components/ui'
+import { Button } from '@/components/ui/Button'
+import HandleFeedback from '@/components/ui/FeedBack'
+import Table from '@/components/ui/Table'
+import supabase from '@/services/Supabase/BaseClient'
+
+const { Tr, Th, Td, THead, TBody } = Table
 
 function MainTable({
   data,
@@ -20,61 +21,61 @@ function MainTable({
   renderRowSubComponent,
   getRowCanExpand,
 }) {
-  const { handleSuccess, handleLoading, handleError } = HandleFeedback();
-  const deleteFunction = async (row) => {
-    console.log(row.original);
-    const varIds = row.original.variations.map((v) => v.id);
-    console.log("VAR ID", varIds);
+  const { handleSuccess, handleLoading, handleError } = HandleFeedback()
+  const deleteFunction = async row => {
+    console.log(row.original)
+    const varIds = row.original.variations.map(v => v.id)
+    console.log('VAR ID', varIds)
     try {
       await supabase
-        .from("supply_variation_product_variations")
+        .from('supply_variation_product_variations')
         .delete()
-        .in("product_variation_id", varIds);
+        .in('product_variation_id', varIds)
 
       await supabase
-        .from("product_variation_attributes")
+        .from('product_variation_attributes')
         .delete()
-        .in("product_variation_id", varIds);
+        .in('product_variation_id', varIds)
 
       await supabase
-        .from("category_product")
+        .from('category_product')
         .delete()
-        .eq("product_id", row.original.id);
+        .eq('product_id', row.original.id)
 
       await supabase
-        .from("offer_products")
+        .from('offer_products')
         .delete()
-        .eq("product_id", row.original.id);
+        .eq('product_id', row.original.id)
 
       await supabase
-        .from("catalog_section_products")
+        .from('catalog_section_products')
         .delete()
-        .eq("product_id", row.original.id);
+        .eq('product_id', row.original.id)
 
       await supabase
-        .from("product_supplies")
+        .from('product_supplies')
         .delete()
-        .eq("product_id", row.original.id);
+        .eq('product_id', row.original.id)
 
       await supabase
-        .from("product_variations")
+        .from('product_variations')
         .delete()
-        .eq("product_id", row.original.id);
-      await supabase.from("products").delete().eq("id", row.original.id);
+        .eq('product_id', row.original.id)
+      await supabase.from('products').delete().eq('id', row.original.id)
     } catch {
-      handleError("Contacte con el Programador.");
+      handleError('Contacte con el Programador.')
     }
-  };
+  }
   const columns = useMemo(
     () => [
       {
         header: () => null,
-        id: "expander",
+        id: 'expander',
         cell: ({ row }) => (
           <>
             {row.getCanExpand() && (
               <button
-                className="text-lg"
+                className='text-lg'
                 {...{ onClick: row.getToggleExpandedHandler() }}
               >
                 {row.getIsExpanded() ? (
@@ -88,26 +89,26 @@ function MainTable({
         ),
       },
       {
-        header: "ID",
-        accessorKey: "id",
+        header: 'ID',
+        accessorKey: 'id',
       },
       {
-        header: "Nombre",
-        accessorKey: "name",
+        header: 'Nombre',
+        accessorKey: 'name',
       },
       {
-        header: "Precio",
-        accessorKey: "standard_price",
+        header: 'Precio',
+        accessorKey: 'standard_price',
         cell: ({ row }) => {
-          console.log(row);
+          console.log(row)
           return (
             <div>
-              {(row.original.standard_price == "simple" && "Simple") ||
+              {(row.original.standard_price == 'simple' && 'Simple') ||
                 (row.original.standard_price == 0
-                  ? "No Tiene Precio"
+                  ? 'No Tiene Precio'
                   : row.original.standard_price)}
             </div>
-          );
+          )
         },
       },
       // {
@@ -115,78 +116,78 @@ function MainTable({
       //   accessorKey: "category.name",
       // },
       {
-        header: "Tipo",
+        header: 'Tipo',
         //accessorKey: "type",
         cell: ({ row }) => {
-          console.log(row);
+          console.log(row)
           return (
             <div>
-              {(row.original.type == "simple" && "Simple") ||
-                (row.original.type == "variable" && "Con Variantes")}
+              {(row.original.type == 'simple' && 'Simple') ||
+                (row.original.type == 'variable' && 'Con Variantes')}
             </div>
-          );
+          )
         },
       },
       {
-        header: "Origen",
+        header: 'Origen',
         //accessorKey: "origin",
         cell: ({ row }) => {
-          console.log(row);
+          console.log(row)
           return (
             <div>
-              {(row.original.origin == "manufactured" && "Manufacturado") ||
-                (row.original.origin == "imported" && "Importado")}
+              {(row.original.origin == 'manufactured' && 'Manufacturado') ||
+                (row.original.origin == 'imported' && 'Importado')}
             </div>
-          );
+          )
         },
       },
       {
-        header: "Insumos",
+        header: 'Insumos',
         //accessorKey: "type",
         cell: ({ row }) => {
-          console.log(row);
+          console.log(row)
           return (
             <div>
-              {row.original.supplies.map((s) => (
+              {row.original.supplies.map(s => (
                 <Tag>{s.name}</Tag>
               ))}
             </div>
-          );
+          )
         },
       },
 
       {
-        header: "Acciones",
+        header: 'Acciones',
         cell: ({ row }) => {
-          console.log(row);
+          console.log(row)
           return (
-            <div className="flex gap-5">
-              <a href={"product-edit/" + row.original.id}>
+            <div className='flex gap-5'>
+              <a href={'product-edit/' + row.original.id}>
                 <Button>Editar</Button>
               </a>
               <div>
                 <Button
                   onClick={async () => {
-                    handleLoading(true);
+                    handleLoading(true)
                     await deleteFunction(row)
-                      .then(() => handleSuccess("Eliminado con Éxito"))
+                      .then(() => handleSuccess('Eliminado con Éxito'))
                       .then(() =>
-                        setProducts((prev) =>
-                          prev.filter((prod) => prod.id != row.original.id)
+                        setProducts(prev =>
+                          prev.filter(prod => prod.id != row.original.id)
                         )
-                      );
+                      )
                   }}
                 >
                   Eliminar
                 </Button>
               </div>
             </div>
-          );
+          )
         },
       },
     ],
     []
-  );
+  )
 
   const table = useReactTable({
     data,
@@ -194,14 +195,14 @@ function MainTable({
     getRowCanExpand,
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
-  });
+  })
 
   return (
     <Table>
       <THead>
-        {table.getHeaderGroups().map((headerGroup) => (
+        {table.getHeaderGroups().map(headerGroup => (
           <Tr key={headerGroup.id}>
-            {headerGroup.headers.map((header) => (
+            {headerGroup.headers.map(header => (
               <Th key={header.id} colSpan={header.colSpan}>
                 {flexRender(
                   header.column.columnDef.header,
@@ -213,10 +214,10 @@ function MainTable({
         ))}
       </THead>
       <TBody>
-        {table.getRowModel().rows.map((row) => (
+        {table.getRowModel().rows.map(row => (
           <Fragment key={row.id}>
             <Tr>
-              {row.getVisibleCells().map((cell) => (
+              {row.getVisibleCells().map(cell => (
                 <Td key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </Td>
@@ -233,7 +234,7 @@ function MainTable({
         ))}
       </TBody>
     </Table>
-  );
+  )
 }
 
-export default MainTable;
+export default MainTable

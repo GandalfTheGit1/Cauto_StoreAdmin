@@ -1,24 +1,30 @@
-import { combineReducers, CombinedState, AnyAction, Reducer } from "redux";
-import auth, { AuthState } from "./slices/auth";
-import base, { BaseState } from "./slices/base";
-import locale, { LocaleState } from "./slices/locale/localeSlice";
-import theme, { ThemeState } from "./slices/theme/themeSlice";
-import products, { ProductState } from "./slices/inventory/makeOrderSlice";
-import RtkQueryService from "@/services/RtkQueryService";
-import dashboard, {SalesDashboardState} from "@/views/sales/SalesDashboard/store/salesDashboardSlice"
+import { combineReducers, CombinedState, AnyAction, Reducer } from 'redux'
+
+import RtkQueryService from '@/services/RtkQueryService'
+import dashboard, {
+  SalesDashboardState,
+} from '@/views/sales/SalesDashboard/store/salesDashboardSlice'
+
+import auth, { AuthState } from './slices/auth'
+import base, { BaseState } from './slices/base'
+import products, { ProductState } from './slices/inventory/makeOrderSlice'
+import locale, { LocaleState } from './slices/locale/localeSlice'
+import theme, { ThemeState } from './slices/theme/themeSlice'
+import preferences, { PreferencesState } from './slices/preferences'
 export type RootState = CombinedState<{
-  auth: CombinedState<AuthState>;
-  base: CombinedState<BaseState>;
-  locale: LocaleState;
-  theme: ThemeState;
-  products: ProductState;
+  auth: CombinedState<AuthState>
+  base: CombinedState<BaseState>
+  locale: LocaleState
+  theme: ThemeState
+  products: ProductState
+  preferences: PreferencesState
   dashboard: SalesDashboardState
   /* eslint-disable @typescript-eslint/no-explicit-any */
-  [RtkQueryService.reducerPath]: any;
-}>;
+  [RtkQueryService.reducerPath]: any
+}>
 
 export interface AsyncReducers {
-  [key: string]: Reducer<any, AnyAction>;
+  [key: string]: Reducer<any, AnyAction>
 }
 // Debes reiniciarlo quitando, y volviendo a poner el elemento padre que quieres agregar
 // si deseas que se actualice el estado desde 0.
@@ -27,18 +33,19 @@ const staticReducers = {
   base,
   locale,
   products,
+  preferences,
   theme,
   dashboard,
   [RtkQueryService.reducerPath]: RtkQueryService.reducer,
-};
+}
 
 const rootReducer =
   (asyncReducers?: AsyncReducers) => (state: RootState, action: AnyAction) => {
     const combinedReducer = combineReducers({
       ...staticReducers,
       ...asyncReducers,
-    });
-    return combinedReducer(state, action);
-  };
+    })
+    return combinedReducer(state, action)
+  }
 
-export default rootReducer;
+export default rootReducer

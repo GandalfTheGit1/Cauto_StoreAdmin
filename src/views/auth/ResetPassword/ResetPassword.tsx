@@ -1,7 +1,7 @@
 import ResetPasswordForm from './ResetPasswordForm'
 
 const ResetPassword = () => {
-    return <ResetPasswordForm disableSubmit={false} />
+  return <ResetPasswordForm disableSubmit={false} />
 }
 
 export default ResetPassword

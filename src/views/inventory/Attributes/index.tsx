@@ -1,33 +1,12 @@
-import AttributesForm from "./Form";
-import AttributesTables from "./Tables";
+import { lazy } from 'react'
 
-import CreateCategoryElement from "./components/Category/Create";
-import GetElements from "./components/GetElements";
-import CreateSubcategoryElement from "./components/Subcategory/Create";
-import CreateAtributeElement from "./components/Variation/Create";
-
-export default function Attributes(){
-
-    const handleAttributeChange = (id, newValue) => {
-        setProductAttributes((prevAttributes) =>
-          prevAttributes.map((attr) =>
-            attr.id === id ? { ...attr, value: newValue } : attr
-          )
-        );
-    };
-
-    
-    return(
-        <div>
-            {/* <div>
-                <CreateCategoryElement />
-                <CreateSubcategoryElement/>
-                <CreateAtributeElement/>
-            </div>
-                <AttributesForm/> */}
-                <br/>
-                <GetElements/>
-                <AttributesTables/>
-        </div>
-        );
+const Attributes = () => {
+  return (
+    <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4">Attributes Management</h1>
+      <p>Attributes management functionality coming soon...</p>
+    </div>
+  )
 }
+
+export default Attributes

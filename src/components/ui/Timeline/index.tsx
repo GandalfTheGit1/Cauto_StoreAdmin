@@ -1,4 +1,5 @@
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
+
 import _Timeline, { TimelineProps } from './Timeline'
 import TimeLineItem from './TimeLineItem'
 
@@ -6,9 +7,9 @@ export type { TimelineProps } from './Timeline'
 export type { TimeLineItemProps } from './TimeLineItem'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    TimelineProps & RefAttributes<HTMLUListElement>
+  TimelineProps & RefAttributes<HTMLUListElement>
 > & {
-    Item: typeof TimeLineItem
+  Item: typeof TimeLineItem
 }
 
 const Timeline = _Timeline as CompoundedComponent

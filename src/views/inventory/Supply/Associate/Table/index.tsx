@@ -1,110 +1,111 @@
-import React, { useState, useEffect } from "react";
-import Select from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/Checkbox";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import Table from "@/components/ui/Table";
+import { ChevronDown, ChevronRight } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+
+import { Checkbox } from '@/components/ui/Checkbox'
+import Select from '@/components/ui/select'
+import Table from '@/components/ui/Table'
 
 // Types
 interface Product {
-  id: number;
-  name: string;
-  variations: ProductVariation[];
-  label: "Tela de Algodón";
-  value: "Tela de Algodón";
+  id: number
+  name: string
+  variations: ProductVariation[]
+  label: 'Tela de Algodón'
+  value: 'Tela de Algodón'
 }
 
 interface ProductVariation {
-  id: number;
-  name: string;
-  product_id: number;
-  label: "Tela de Algodón";
-  value: "Tela de Algodón";
+  id: number
+  name: string
+  product_id: number
+  label: 'Tela de Algodón'
+  value: 'Tela de Algodón'
 }
 
 interface Supply {
-  id: number;
-  name: string;
-  variations: SupplyVariation[];
-  label: "Tela de Algodón";
-  value: "Tela de Algodón";
+  id: number
+  name: string
+  variations: SupplyVariation[]
+  label: 'Tela de Algodón'
+  value: 'Tela de Algodón'
 }
 
 interface SupplyVariation {
-  id: number;
-  name: string;
-  supply_id: number;
-  label: "Tela de Algodón";
-  value: "Tela de Algodón";
+  id: number
+  name: string
+  supply_id: number
+  label: 'Tela de Algodón'
+  value: 'Tela de Algodón'
 }
 
 // Mock Data Service
 const getMockProducts = (): Product[] => [
   {
     id: 1,
-    name: "Jarra",
-    label: "Tela de Algodón",
-    value: "Tela de Algodón",
+    name: 'Jarra',
+    label: 'Tela de Algodón',
+    value: 'Tela de Algodón',
     variations: [
       {
         id: 1,
-        name: "Camiseta Roja S",
+        name: 'Camiseta Roja S',
         product_id: 1,
-        label: "Tela de Algodón",
-        value: "Tela de Algodón",
+        label: 'Tela de Algodón',
+        value: 'Tela de Algodón',
       },
       {
         id: 2,
-        name: "Camiseta Azul M",
+        name: 'Camiseta Azul M',
         product_id: 1,
-        label: "Tela de Algodón",
-        value: "Tela de Algodón",
+        label: 'Tela de Algodón',
+        value: 'Tela de Algodón',
       },
     ],
   },
   {
     id: 2,
-    name: "Pantalón",
-    label: "Tela de Algodón",
-    value: "Tela de Algodón",
+    name: 'Pantalón',
+    label: 'Tela de Algodón',
+    value: 'Tela de Algodón',
     variations: [
       {
         id: 3,
-        name: "Pantalón Negro 32",
+        name: 'Pantalón Negro 32',
         product_id: 2,
-        label: "Tela de Algodón",
-        value: "Tela de Algodón",
+        label: 'Tela de Algodón',
+        value: 'Tela de Algodón',
       },
       {
         id: 4,
-        name: "Pantalón Gris 34",
+        name: 'Pantalón Gris 34',
         product_id: 2,
-        label: "Tela de Algodón",
-        value: "Tela de Algodón",
+        label: 'Tela de Algodón',
+        value: 'Tela de Algodón',
       },
     ],
   },
-];
+]
 
 const getMockSupplies = (): Supply[] => [
   {
     id: 1,
-    name: "Tela de Algodón",
-    label: "Tela de Algodón",
-    value: "Tela de Algodón",
+    name: 'Tela de Algodón',
+    label: 'Tela de Algodón',
+    value: 'Tela de Algodón',
     variations: [
       {
         id: 1,
-        name: "Tela de Algodón Roja",
+        name: 'Tela de Algodón Roja',
         supply_id: 1,
-        label: "Tela de Algodón",
-        value: "Tela de Algodón",
+        label: 'Tela de Algodón',
+        value: 'Tela de Algodón',
       },
       {
         id: 2,
-        name: "Tela de Algodón Azul",
+        name: 'Tela de Algodón Azul',
         supply_id: 1,
-        label: "Tela de Algodón",
-        value: "Tela de Algodón",
+        label: 'Tela de Algodón',
+        value: 'Tela de Algodón',
       },
     ],
   },
@@ -116,12 +117,12 @@ const getMockSupplies = (): Supply[] => [
   //     { id: 4, name: "Botones Plateados", supply_id: 2 },
   //   ],
   // },
-];
+]
 
 const getMockAssociations = (): { productId: number; supplyId: number }[] => [
   { productId: 1, supplyId: 1 },
   { productId: 2, supplyId: 2 },
-];
+]
 
 // Supabase Service (comentado)
 /*
@@ -170,19 +171,19 @@ const updateAssociation = async (productId: number, supplyId: number, isAssociat
 */
 
 export default function ProductSupplyAssociationTable() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [supplies, setSupplies] = useState<Supply[]>([]);
+  const [products, setProducts] = useState<Product[]>([])
+  const [supplies, setSupplies] = useState<Supply[]>([])
   const [associations, setAssociations] = useState<
     { productId: number; supplyId: number }[]
-  >([]);
-  const [expandedRows, setExpandedRows] = useState<number[]>([]);
+  >([])
+  const [expandedRows, setExpandedRows] = useState<number[]>([])
 
-  const { Tr, Th, Td, THead, TBody } = Table;
+  const { Tr, Th, Td, THead, TBody } = Table
   useEffect(() => {
     // Fetch data
-    setProducts(getMockProducts());
-    setSupplies(getMockSupplies());
-    setAssociations(getMockAssociations());
+    setProducts(getMockProducts())
+    setSupplies(getMockSupplies())
+    setAssociations(getMockAssociations())
 
     // Uncomment to use with Supabase
     // const fetchData = async () => {
@@ -196,21 +197,21 @@ export default function ProductSupplyAssociationTable() {
     //   setAssociations(associationsData)
     // }
     // fetchData()
-  }, []);
+  }, [])
 
   const toggleRowExpansion = (productId: number) => {
-    setExpandedRows((prev) =>
+    setExpandedRows(prev =>
       prev.includes(productId)
-        ? prev.filter((id) => id !== productId)
+        ? prev.filter(id => id !== productId)
         : [...prev, productId]
-    );
-  };
+    )
+  }
 
   const isAssociated = (productId: number, supplyId: number) => {
     return associations.some(
-      (a) => a.productId === productId && a.supplyId === supplyId
-    );
-  };
+      a => a.productId === productId && a.supplyId === supplyId
+    )
+  }
 
   const handleAssociationChange = (
     productId: number,
@@ -218,57 +219,57 @@ export default function ProductSupplyAssociationTable() {
     checked: boolean
   ) => {
     if (checked) {
-      setAssociations((prev) => [...prev, { productId, supplyId }]);
+      setAssociations(prev => [...prev, { productId, supplyId }])
     } else {
-      setAssociations((prev) =>
+      setAssociations(prev =>
         prev.filter(
-          (a) => !(a.productId === productId && a.supplyId === supplyId)
+          a => !(a.productId === productId && a.supplyId === supplyId)
         )
-      );
+      )
     }
     // Uncomment to use with Supabase
     // updateAssociation(productId, supplyId, checked)
-  };
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">
+    <div className='container mx-auto p-4'>
+      <h1 className='text-2xl font-bold mb-4'>
         Asociación de Productos y Suministros
       </h1>
       <Table>
         <THead>
           <Tr>
-            <Th className="w-[50px]"></Th>
+            <Th className='w-[50px]'></Th>
             <Th>Producto</Th>
             <Th>Suministro</Th>
-            <Th className="w-[100px]">Asociado</Th>
+            <Th className='w-[100px]'>Asociado</Th>
           </Tr>
         </THead>
         <TBody>
-          {products.map((product) => (
+          {products.map(product => (
             <React.Fragment key={product.id}>
               <Tr>
                 <Td>
                   <button
                     onClick={() => toggleRowExpansion(product.id)}
-                    className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+                    className='p-1 rounded-full hover:bg-gray-200 transition-colors'
                     aria-label={
                       expandedRows.includes(product.id)
-                        ? "Contraer fila"
-                        : "Expandir fila"
+                        ? 'Contraer fila'
+                        : 'Expandir fila'
                     }
                   >
                     {expandedRows.includes(product.id) ? (
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronDown className='h-4 w-4' />
                     ) : (
-                      <ChevronRight className="h-4 w-4" />
+                      <ChevronRight className='h-4 w-4' />
                     )}
                   </button>
                 </Td>
                 <Td>{product.name}</Td>
                 <Td>
                   <Select
-                    placeholder="Seleccionar suministro"
+                    placeholder='Seleccionar suministro'
                     onChange={({ value }) =>
                       handleAssociationChange(product.id, parseInt(value), true)
                     }
@@ -276,11 +277,9 @@ export default function ProductSupplyAssociationTable() {
                   ></Select>
                 </Td>
                 <Td>
-                  {supplies.some((supply) =>
-                    isAssociated(product.id, supply.id)
-                  )
-                    ? "Sí"
-                    : "No"}
+                  {supplies.some(supply => isAssociated(product.id, supply.id))
+                    ? 'Sí'
+                    : 'No'}
                 </Td>
               </Tr>
               {expandedRows.includes(product.id) && (
@@ -291,19 +290,19 @@ export default function ProductSupplyAssociationTable() {
                         <Tr>
                           <Th>Variación de Producto</Th>
                           <Th>Variación de Suministro</Th>
-                          <Th className="w-[100px]">Asociado</Th>
+                          <Th className='w-[100px]'>Asociado</Th>
                         </Tr>
                       </THead>
                       <TBody>
-                        {product.variations.map((productVariation) => (
+                        {product.variations.map(productVariation => (
                           <Tr key={productVariation.id}>
                             <Td>{productVariation.name}</Td>
                             <Td>
                               <Select
                                 options={supplies.flatMap(
-                                  (supply) => supply.variations
+                                  supply => supply.variations
                                 )}
-                                placeholder="Seleccionar variación de suministro"
+                                placeholder='Seleccionar variación de suministro'
                               ></Select>
                             </Td>
                             <Td>
@@ -321,5 +320,5 @@ export default function ProductSupplyAssociationTable() {
         </TBody>
       </Table>
     </div>
-  );
+  )
 }

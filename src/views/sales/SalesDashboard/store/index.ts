@@ -1,23 +1,24 @@
 import { combineReducers } from '@reduxjs/toolkit'
-import reducers, {
-    SLICE_NAME,
-    SalesDashboardState,
-} from './salesDashboardSlice'
 import { useSelector } from 'react-redux'
-
 import type { TypedUseSelectorHook } from 'react-redux'
+
 import type { RootState } from '@/store'
 
+import reducers, {
+  SLICE_NAME,
+  SalesDashboardState,
+} from './salesDashboardSlice'
+
 const reducer = combineReducers({
-    data: reducers,
+  data: reducers,
 })
 
 export const useAppSelector: TypedUseSelectorHook<
-    RootState & {
-        [SLICE_NAME]: {
-            data: SalesDashboardState
-        }
+  RootState & {
+    [SLICE_NAME]: {
+      data: SalesDashboardState
     }
+  }
 > = useSelector
 
 export * from './salesDashboardSlice'

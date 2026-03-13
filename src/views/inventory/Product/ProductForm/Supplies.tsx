@@ -1,64 +1,67 @@
-import AdaptableCard from "@/components/shared/AdaptableCard";
-import { Select } from "@/components/ui";
-import { FormItem } from "@/components/ui/Form";
-import type { InputProps } from "@/components/ui/Input";
-import Input from "@/components/ui/Input";
-import { supabaseService } from "@/services/Supabase/AttributeService";
 import {
   Field,
   FieldInputProps,
   FieldProps,
   FormikErrors,
   FormikTouched,
-} from "formik";
-import { useEffect, useState, type ComponentType } from "react";
-import { NumericFormat, NumericFormatProps } from "react-number-format";
-import { Supply } from "../../Supply/List/Data/types";
-import { ProductData, transformArrayToObjectArray } from "./ProductForm";
-import { Product } from "@/@types/products";
+} from 'formik'
+import { useEffect, useState, type ComponentType } from 'react'
+import { NumericFormat, NumericFormatProps } from 'react-number-format'
+
+import { Product } from '@/@types/products'
+import AdaptableCard from '@/components/shared/AdaptableCard'
+import { Select } from '@/components/ui'
+import { FormItem } from '@/components/ui/Form'
+import type { InputProps } from '@/components/ui/Input'
+import Input from '@/components/ui/Input'
+import { supabaseService } from '@/services/Supabase/AttributeService'
+
+import { Supply } from '../../Supply/List/Data/types'
+
+import { ProductData, transformArrayToObjectArray } from './ProductForm'
 
 // Nuevos tipos
-type ProductType = "manufactured" | "imported";
-type ProductStatus = "new" | "out_of_stock" | "in_stock" | "discontinued";
+type ProductType = 'manufactured' | 'imported'
+type ProductStatus = 'new' | 'out_of_stock' | 'in_stock' | 'discontinued'
 
 type SuppliesProps = {
-  touched: FormikTouched<Supply>;
-  errors: FormikErrors<Supply>;
-  values: ProductData;
-  supplies: Supply[];
-};
+  touched: FormikTouched<Supply>
+  errors: FormikErrors<Supply>
+  values: ProductData
+  supplies: Supply[]
+}
 
 const PriceInput = (props: InputProps) => {
-  return <Input {...props} value={props.field.value} prefix="$" />;
-};
+  return <Input {...props} value={props.field.value} prefix='$' />
+}
 
 const NumericFormatInput = ({
   onValueChange,
   ...rest
-}: Omit<NumericFormatProps, "form"> & {
-  form: any;
-  field: FieldInputProps<unknown>;
+}: Omit<NumericFormatProps, 'form'> & {
+  form: any
+  field: FieldInputProps<unknown>
 }) => {
   return (
     <NumericFormat
       customInput={Input as ComponentType}
-      type="text"
-      autoComplete="off"
+      type='text'
+      autoComplete='off'
       onValueChange={onValueChange}
       {...rest}
     />
-  );
-};
+  )
+}
 
 const Supplies = (props: SuppliesProps) => {
-  const { values, touched, errors, supplies } = props;
+  const { values, touched, errors, supplies } = props
 
   return (
-    <AdaptableCard divider className="mb-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="col-span-1">
+    <AdaptableCard divider className='mb-4'>
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        <div className='col-span-1'>
           <FormItem
-            label="Insumos"
+            label='Insumos'
             invalid={(errors.supplies && touched.supplies) as boolean}
             errorMessage={errors.supplies}
           >
@@ -66,27 +69,24 @@ const Supplies = (props: SuppliesProps) => {
               {({ field, form }: FieldProps) => (
                 <Select
                   isMulti
-                  name="supplies"
-                  placeholder="Seleccione insumos"
-                  defaultValue={
-                    values.supplies
-                    .map((supply) => supplies.find((s) => s.value === supply))
-                    .filter(Boolean)
-                  }
+                  name='supplies'
+                  placeholder='Seleccione insumos'
+                  defaultValue={values.supplies
+                    .map(supply => supplies.find(s => s.value === supply))
+                    .filter(Boolean)}
                   options={supplies}
-
-                  value={
-                    values.supplies
-                    .map((supply) => supplies.find((s) => s.value === supply))
-                    .filter(Boolean)
-                  }
- 
-                  onChange={(option) => {
-                    console.log(field.name, option.map((op) => op.id));
+                  value={values.supplies
+                    .map(supply => supplies.find(s => s.value === supply))
+                    .filter(Boolean)}
+                  onChange={option => {
+                    console.log(
+                      field.name,
+                      option.map(op => op.id)
+                    )
                     form.setFieldValue(
                       field.name,
-                      option.map((op) => op.id)
-                    );
+                      option.map(op => op.id)
+                    )
                   }}
                 />
               )}
@@ -95,7 +95,7 @@ const Supplies = (props: SuppliesProps) => {
         </div>
       </div>
     </AdaptableCard>
-  );
-};
+  )
+}
 
-export default Supplies;
+export default Supplies

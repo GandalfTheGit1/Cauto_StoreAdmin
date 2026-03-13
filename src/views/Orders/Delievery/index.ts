@@ -1,3 +1,3 @@
-import MakeOrder from "./DeliveryWrapper";
+import MakeOrder from './DeliveryWrapper'
 
 export default MakeOrder

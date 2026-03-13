@@ -1,14 +1,15 @@
 import type { ForwardRefExoticComponent, RefAttributes } from 'react'
-import _InputGroup, { InputGroupProps } from './InputGroup'
+
 import Addon from './Addon'
+import _InputGroup, { InputGroupProps } from './InputGroup'
 
 export type { InputGroupProps } from './InputGroup'
 export type { AddonProps } from './Addon'
 
 type CompoundedComponent = ForwardRefExoticComponent<
-    InputGroupProps & RefAttributes<HTMLDivElement>
+  InputGroupProps & RefAttributes<HTMLDivElement>
 > & {
-    Addon: typeof Addon
+  Addon: typeof Addon
 }
 
 const InputGroup = _InputGroup as CompoundedComponent

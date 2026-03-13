@@ -1,41 +1,42 @@
-import { forwardRef } from 'react'
 import classNames from 'classnames'
-import { useConfig } from '../ConfigProvider'
-import { useForm } from '../Form/context'
-import { InputGroupContextProvider, InputGroupContextConsumer } from './context'
+import { forwardRef } from 'react'
 
 import type { CommonProps, TypeAttributes } from '../@types/common'
+import { useConfig } from '../ConfigProvider'
+import { useForm } from '../Form/context'
+
+import { InputGroupContextProvider, InputGroupContextConsumer } from './context'
 
 export interface InputGroupProps extends CommonProps {
-    size?: TypeAttributes.ControlSize
+  size?: TypeAttributes.ControlSize
 }
 
 const InputGroup = forwardRef<HTMLDivElement, InputGroupProps>((props, ref) => {
-    const { children, className, size } = props
+  const { children, className, size } = props
 
-    const { controlSize } = useConfig()
-    const formControlSize = useForm()?.size
+  const { controlSize } = useConfig()
+  const formControlSize = useForm()?.size
 
-    const inputGroupSize = size || formControlSize || controlSize
+  const inputGroupSize = size || formControlSize || controlSize
 
-    const inputGroupClass = classNames('input-group', className)
+  const inputGroupClass = classNames('input-group', className)
 
-    const contextValue = {
-        size: inputGroupSize,
-    }
-    return (
-        <InputGroupContextProvider value={contextValue}>
-            <InputGroupContextConsumer>
-                {() => {
-                    return (
-                        <div ref={ref} className={inputGroupClass}>
-                            {children}
-                        </div>
-                    )
-                }}
-            </InputGroupContextConsumer>
-        </InputGroupContextProvider>
-    )
+  const contextValue = {
+    size: inputGroupSize,
+  }
+  return (
+    <InputGroupContextProvider value={contextValue}>
+      <InputGroupContextConsumer>
+        {() => {
+          return (
+            <div ref={ref} className={inputGroupClass}>
+              {children}
+            </div>
+          )
+        }}
+      </InputGroupContextConsumer>
+    </InputGroupContextProvider>
+  )
 })
 
 InputGroup.displayName = 'InputGroup'

@@ -1,39 +1,40 @@
 import { useState } from 'react'
-import Button from '@/components/ui/Button'
 import { HiOutlineCog, HiOutlinePencil, HiOutlineInboxIn } from 'react-icons/hi'
 
+import Button from '@/components/ui/Button'
+
 const ButtonWithIcon = () => {
-    const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-    const onClick = () => {
-        setLoading(true)
+  const onClick = () => {
+    setLoading(true)
 
-        setTimeout(() => {
-            setLoading(false)
-        }, 3000)
-    }
+    setTimeout(() => {
+      setLoading(false)
+    }, 3000)
+  }
 
-    return (
-        <div className="flex-wrap inline-flex xl:flex items-center gap-2">
-            <Button className="mr-2" icon={<HiOutlinePencil />}>
-                <span>Edit</span>
-            </Button>
-            <Button className="mr-2" variant="twoTone" icon={<HiOutlineCog />}>
-                <span>
-                    <span>Settings</span>
-                </span>
-            </Button>
-            <Button
-                className="mr-2"
-                variant="solid"
-                loading={loading}
-                icon={<HiOutlineInboxIn />}
-                onClick={onClick}
-            >
-                <span>With Loading (Click to trigger)</span>
-            </Button>
-        </div>
-    )
+  return (
+    <div className='flex-wrap inline-flex xl:flex items-center gap-2'>
+      <Button className='mr-2' icon={<HiOutlinePencil />}>
+        <span>Edit</span>
+      </Button>
+      <Button className='mr-2' variant='twoTone' icon={<HiOutlineCog />}>
+        <span>
+          <span>Settings</span>
+        </span>
+      </Button>
+      <Button
+        className='mr-2'
+        variant='solid'
+        loading={loading}
+        icon={<HiOutlineInboxIn />}
+        onClick={onClick}
+      >
+        <span>With Loading (Click to trigger)</span>
+      </Button>
+    </div>
+  )
 }
 
 export default ButtonWithIcon

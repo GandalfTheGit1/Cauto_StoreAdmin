@@ -20,7 +20,10 @@ export function useConnectionStatus() {
 
       try {
         const startTime = performance.now()
-        const response = await fetch('https://www.cloudflare.com/cdn-cgi/trace', { cache: 'no-store' })
+        const response = await fetch(
+          'https://www.cloudflare.com/cdn-cgi/trace',
+          { cache: 'no-store' }
+        )
         const endTime = performance.now()
 
         if (!response.ok) {
@@ -30,17 +33,21 @@ export function useConnectionStatus() {
         const data = await response.text()
         const bytes = new Blob([data]).size
         const durationInSeconds = (endTime - startTime) / 1000
-        const speedKbps = (bytes) / durationInSeconds // Convert to kbps
+        const speedKbps = bytes / durationInSeconds // Convert to kbps
         const latency = endTime - startTime // Latency in ms
 
         console.log(`Speed: ${speedKbps} Kbps, Latency: ${latency} ms`)
-        console.log(`
+        console.log(
+          `
         Speed: ${speedKbps}, 
         Threshold: ${SPEED_GOOD_THRESHOLD}Kbps, 
         Latency: ${latency} ms
          ${LATENCY_THRESHOLD} ms
         
-        `, speedKbps >= SPEED_GOOD_THRESHOLD, latency <= LATENCY_THRESHOLD)
+        `,
+          speedKbps >= SPEED_GOOD_THRESHOLD,
+          latency <= LATENCY_THRESHOLD
+        )
 
         // Ajuste de estados según rangos
         if (speedKbps >= SPEED_GOOD_THRESHOLD && latency <= LATENCY_THRESHOLD) {
